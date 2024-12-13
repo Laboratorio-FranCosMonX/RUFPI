@@ -1,8 +1,9 @@
-import { Box, Button, Card, CardContent, CardHeader, Container, FormControl, Grid2, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, CardHeader, Container, Grid2, TextField, Typography } from "@mui/material";
+import { FormEvent } from "react";
 
 export default function Login() {
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 
   }
 
@@ -11,10 +12,11 @@ export default function Login() {
       <Box width="100%" display={"flex"} marginBottom={"20px"} justifyContent={'space-between'}>
         <Typography variant="h4">RUFPI</Typography>
       </Box>
+
       <Card variant="elevation" sx={{ width: { xs: '100%', sm: '75%', md: '50%', lg: '40%', xl: '30%' } }}>
-        <CardHeader title={"Login de usuário"}></CardHeader>
-        <CardContent>
-          <FormControl sx={{
+        <CardHeader title={"Login de usuário"} subheader="Conta do administrador ou do aluno com cadastro confirmado na plataforma." />
+        <form onSubmit={handleSubmit}>
+          <CardContent sx={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -23,9 +25,9 @@ export default function Login() {
           }}>
             <TextField
               name="usuario"
-              id="usuario"
               label="Usuário"
               variant="outlined"
+              required
               fullWidth
             />
             <TextField
@@ -33,19 +35,19 @@ export default function Login() {
               id="senha"
               label="Senha"
               variant="outlined"
+              required
               fullWidth
             />
-
             <Grid2 width="100%" display="flex" justifyContent="space-between">
               <Button>Cadastrar-se</Button>
               <Button type="submit" variant="contained">
                 Entrar
               </Button>
             </Grid2>
-          </FormControl>
-        </CardContent>
+          </CardContent>
+        </form>
       </Card>
 
-    </Container>
+    </Container >
   );
 }
