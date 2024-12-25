@@ -1,7 +1,9 @@
 import { Box, Button, Card, CardContent, CardHeader, Container, Grid2, TextField, Typography } from "@mui/material";
 import { FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate()
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 
@@ -39,7 +41,9 @@ export default function Login() {
               fullWidth
             />
             <Grid2 width="100%" display="flex" justifyContent="space-between">
-              <Button>Cadastrar-se</Button>
+              <Button onClick={() => {
+                navigate("/register")
+              }}>Cadastrar-se</Button>
               <Button type="submit" variant="contained">
                 Entrar
               </Button>
