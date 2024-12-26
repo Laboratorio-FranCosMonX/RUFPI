@@ -15,3 +15,7 @@ body {
   width: 100vw;
   min-height: 100vh;
 }
+
+.MuiContainer {
+  padding: 0px;
+}

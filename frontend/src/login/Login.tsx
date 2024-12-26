@@ -6,7 +6,7 @@ export default function Login() {
   const navigate = useNavigate()
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-
+    navigate("home");
   }
 
   return (
