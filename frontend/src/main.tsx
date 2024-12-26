@@ -6,6 +6,7 @@ import Home from './home/Home.tsx'
 import './index.css'
 import Login from './login/Login.tsx'
 import Cadastro from './register/Register.tsx'
+import Perfil from './user/Profile.tsx'
 
 const theme = createTheme({
   components: {
@@ -34,6 +35,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Cadastro />} />
           <Route path="home" element={<Home />} />
+          <Route path="profile" element={<Perfil />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

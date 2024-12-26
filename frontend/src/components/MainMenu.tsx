@@ -74,7 +74,9 @@ const MainMenu = () => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => {
+          navigate('/profile')
+        }}>
           <Avatar /> Perfil
         </MenuItem>
         <MenuItem onClick={handleClose}>
