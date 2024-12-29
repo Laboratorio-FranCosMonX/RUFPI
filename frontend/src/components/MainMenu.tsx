@@ -22,7 +22,11 @@ const MainMenu = () => {
           },
           color: 'black',
           fontSize: '25px',
-          padding: '0px'
+          padding: '0px',
+          paddingLeft: '7px',
+          paddingRight: '7px'
+        }} onClick={() => {
+          navigate("/home")
         }}>RUFPI</Button>
         <Tooltip title="Configurações da conta">
           <IconButton

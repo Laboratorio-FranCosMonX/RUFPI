@@ -1,12 +1,44 @@
-import { Box, Button, Card, CardContent, CardHeader, Container, Divider, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from "@mui/material";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Box, Button, Card, CardContent, CardHeader, Container, Divider, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import api from "../utils/api/api";
+import { userRegisterFormData, userRegisterSchema } from "../utils/schemas/UserRegisterSchema";
 
 const Cadastro = () => {
-
+  const navigate = useNavigate();
   const [tipoConta, setTipoConta] = useState<number>(-1);
 
-  const handleSelectChange = (event: SelectChangeEvent) => {
-    setTipoConta(parseInt(event.target.value));
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control
+  } = useForm<userRegisterFormData>({
+    resolver: zodResolver(userRegisterSchema),
+  })
+
+  /**
+   * A ser implementado:
+   * - mostrar uma mensagem ao usuário impedindo que ele use qualquer comando enquanto a aplicação
+   * esteja esperando a resposta.
+   * 
+   * @param data 
+   */
+  const onSubmit: SubmitHandler<userRegisterFormData> = async (data) => {
+    await api
+      .post("/usuario", data)
+      .then(() => {
+        alert("registrado com sucesso")
+        setTimeout(() => {//ir para a tela de login
+          navigate('/')
+        }, 1000);
+      })
+      .catch((erro) => {
+        console.log(erro)
+        alert("falha ao registrar usuario")
+      })
   }
 
   return (
@@ -17,18 +49,29 @@ const Cadastro = () => {
 
       <Card variant="elevation" sx={{ width: { xs: '100%', sm: '75%', md: '50%', lg: '40%', xl: '30%' } }}>
         <CardHeader title={"Cadastro de usuário"} />
-        <form>
-          <CardContent sx={{ display: 'flex', flexDirection: "column", gap: '7px' }}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <CardContent sx={{ display: 'flex', flexDirection: "column", gap: '15px' }}>
             <Box display={"flex"} justifyContent={"space-between"} alignItems={'center'}>
-
               <InputLabel id="tipoDeConta">Tipo de conta</InputLabel>
-              <Select
-                labelId="tipoDeConta"
-                onChange={handleSelectChange}
-              >
-                <MenuItem value={0}>Discente</MenuItem>
-                <MenuItem value={1}>Administrador</MenuItem>
-              </Select>
+              <Controller
+                name="tipo"
+                control={control}
+                defaultValue={-1} // Valor inicial
+                render={({ field }) => (
+                  <Select
+                    {...field} // Vai integrar o campo do Select com o React Hook Form
+                    labelId="tipoDeConta"
+                    value={field.value !== -1 ? field.value : ''} // Valor controlado
+                    onChange={(e) => {
+                      field.onChange(Number(e.target.value)); // Atualiza o valor do formulário
+                      setTipoConta(Number(e.target.value)); // Atualiza o estado do tipoConta
+                    }}
+                  >
+                    <MenuItem value={0}>Discente</MenuItem>
+                    <MenuItem value={1}>Administrador</MenuItem>
+                  </Select>
+                )}
+              />
             </Box>
             {tipoConta != -1 &&
               <>
@@ -37,6 +80,9 @@ const Cadastro = () => {
                   label="CPF"
                   type="text"
                   variant="outlined"
+                  {...register('cpf')}
+                  error={!!errors.cpf}
+                  helperText={errors.cpf?.message}
                   required
                   fullWidth
                 />
@@ -44,6 +90,9 @@ const Cadastro = () => {
                   label="Nome Completo"
                   type="text"
                   variant="outlined"
+                  {...register('nome')}
+                  error={!!errors.nome}
+                  helperText={errors.nome?.message}
                   required
                   fullWidth
                 />
@@ -51,13 +100,19 @@ const Cadastro = () => {
                   label="Email"
                   type="email"
                   variant="outlined"
+                  {...register('email')}
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
                   required
                   fullWidth
                 />
                 <TextField
                   label={tipoConta == 0 ? "matricula" : "Siape"}
-                  type="number"
+                  type="text"
                   variant="outlined"
+                  {...register('id')}
+                  error={!!errors.id}
+                  helperText={errors.id?.message}
                   required
                   fullWidth
                 />
@@ -65,6 +120,9 @@ const Cadastro = () => {
                   label="Senha"
                   type="password"
                   variant="outlined"
+                  {...register('senha')}
+                  error={!!errors.senha}
+                  helperText={errors.senha?.message}
                   required
                   fullWidth
                 />
@@ -72,12 +130,15 @@ const Cadastro = () => {
                   label="Repetir senha"
                   type="password"
                   variant="outlined"
+                  {...register('repetirSenha')}
+                  error={!!errors.repetirSenha}
+                  helperText={errors.repetirSenha?.message}
                   required
                   fullWidth
                 />
                 <Box display={'flex'} justifyContent={"space-between"}>
                   <Button variant="contained">Cancelar</Button>
-                  <Button variant="contained">Confirmar solicitação</Button>
+                  <Button variant="contained" type="submit">Confirmar solicitação</Button>
                 </Box>
               </>
             }

@@ -19,6 +19,7 @@ body {
 .image-profile {
   max-width: 170px;
   max-height: 170px;
+  border-radius: 20px;
 }
 
 .image-paper-profile {
