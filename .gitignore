@@ -1,0 +1,10 @@
+instance/
+
+static/
+
+.vscode/
+.idea/
+*.iml
+
+*.db
+backend/test.py
