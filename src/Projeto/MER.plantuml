@@ -1,0 +1,49 @@
+@startuml
+
+left to right direction
+
+class Tipo {
+    -tipo: string
+    -id: number autoincrement
+    -descricao: string
+}
+
+class Usuario{
+    -id: number matricula/siapi
+    -nome: string
+    -email: string
+    -cpf: number
+    -senha: string
+    -tipo: Tipo
+    -isNutricionista: boolean
+    -createAt: Date
+    -updateAt: Date
+}
+
+class Cardapio{
+    -id: number
+    -descricao: string
+    -data: Date
+    -anotacao: string
+    -createAt: Date
+    -updateAt: Date
+}
+
+class Prato{
+    -id: number
+    -nome: string
+    -createAt: Date
+    -updateAt: Date
+}
+
+class Igrediente{
+    -id: number
+    -nome: string
+}
+
+Usuario --- Tipo: 1 - 1
+Usuario --- Cardapio: n - n
+Cardapio --- Prato: n - n
+Prato --- Igrediente: n - n
+
+@enduml

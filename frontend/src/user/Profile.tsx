@@ -1,23 +1,83 @@
-import { Box, Button, Container, Divider, Grid2, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, Button, Container, Divider, Grid2, LinearProgress, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import MainMenu from "../components/MainMenu";
+import api from "../utils/api/api";
+import AtualizarEmail from "./UpdateEmail";
+import AtualizarSenha from "./UpdatePassword";
 
 interface Usuario {
   nome: string
-  id: number
+  id: string
   email: string
-  tipo: 'administrador' | 'discente'
-  qtdFichas: number
+  tipo: number
+}
+
+interface ModalInterface {
+  dadosDoUsuario: boolean
+  email: boolean
+  senha: boolean
+  comprarFicha: boolean
 }
 
 const Perfil = () => {
 
   const [profile, setProfile] = useState<Usuario>({
-    nome: "fulano de tal", id: 22555255555, email: 'fulano@gmail.com', tipo: "discente", qtdFichas: 5
+    email: '', id: '', nome: '', tipo: -1
   })
+  const [profileInicializado, setProfileInicializado] = useState(false)
+  const [dadosCarregados, setDadosCarregados] = useState(false)
+  const [modal, setModal] = useState<ModalInterface>({ comprarFicha: false, dadosDoUsuario: false, email: false, senha: false })
+
+  useEffect(() => {
+    if (!profileInicializado) {
+      setTimeout(() => {
+        setProfileInicializado(true);
+        handleProfileData();
+      }, 200);
+    }
+  }, [profileInicializado])
 
   const handleProfileData = async () => {
+    await api.get(`/usuario/${api.defaults.data.user.id}`)
+      .then((response) => {
+        setProfile(response.data)
+        if (profile !== undefined) setDadosCarregados(true)
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+  }
 
+  const callbackCloseModal = () => {
+    setModal({
+      comprarFicha: false,
+      dadosDoUsuario: false,
+      email: false,
+      senha: false
+    })
+  }
+
+  const callbackModalOK = () => {
+    handleProfileData();
+  }
+
+  const handleModal = () => {
+    if (!modal.comprarFicha && !modal.dadosDoUsuario && !modal.email && !modal.senha)
+      return false;
+
+    if (modal.email)
+      return (
+        <AtualizarEmail
+          fecharModal={callbackCloseModal}
+          atualizarDados={callbackModalOK}
+          updateAt={Date.now().toLocaleString()}
+          id={profile.id}
+          password={"teste"}
+        />
+      )
+    return (
+      <AtualizarSenha fecharModal={callbackCloseModal} atualizarDados={callbackModalOK} updateAt={Date.now().valueOf() + " "} password={"teste"} id={profile.id} />
+    )
   }
 
   return (
@@ -27,26 +87,51 @@ const Perfil = () => {
         fontSize: '5px',
         backgroundColor: 'black'
       }} />
-      <Box width={"100%"} paddingTop={3} display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'}>
-        <Grid2 display={"flex"} justifyContent={'space-between'} width={'70%'} border={"1px solid gray"} borderRadius={'19px'} >
-          <Box display="flex" flexDirection={"column"} gap={1} margin={2} width={'50%'} position={"relative"}>
-            <Typography variant="h5">{profile.nome}</Typography>
-            <Typography variant="body1">Matricula: {profile.id}</Typography>
-            <Typography variant="body1">Email: {profile.email}</Typography>
-            <Typography variant="body1">Fichas: {profile.qtdFichas}</Typography>
-            <img className="image-paper-profile" src="papelDeParedePerfilUsuario.jpg" alt="" />
-          </Box>
-          <Box>
-            <img className="image-profile" src="imageProfile.jpg" alt="" />
-          </Box>
-        </Grid2>
-        <Box display={"flex"} justifyContent={"space-evenly"} width={'100%'} marginTop={3}>
-          <Button variant="contained">Editar Perfil</Button>
-          <Button variant="outlined">Atualizar Email</Button>
-          <Button variant="outlined">Atualizar Senha</Button>
-          <Button variant="contained">Comprar Fichas</Button>
+      {
+        !dadosCarregados &&
+        <Box sx={{
+          marginTop: '20px'
+        }}>
+          <LinearProgress />
+          <Typography>Carregando</Typography>
         </Box>
-      </Box>
+
+        ||
+
+        !!dadosCarregados && profile !== undefined &&
+        <Box width={"100%"} paddingTop={3} display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'}>
+          <Grid2 display={"flex"} justifyContent={'space-between'} width={'70%'} border={"1px solid gray"} borderRadius={'19px'} >
+            <Box display="flex" flexDirection={"column"} gap={1} margin={2} width={'50%'} position={"relative"}>
+              <Typography variant="h5">{profile.nome}</Typography>
+              <Typography variant="body1">Matricula: {profile.id}</Typography>
+              <Typography variant="body1">Email: {profile.email}</Typography>
+              <Typography variant="body1">Fichas: 1</Typography>
+              <img className="image-paper-profile" src="papelDeParedePerfilUsuario.jpg" alt="" />
+            </Box>
+            <Box>
+              <img className="image-profile" src="imageProfile.jpg" alt="" />
+            </Box>
+          </Grid2>
+          <Box display={"flex"} justifyContent={"space-evenly"} width={'100%'} marginTop={3}>
+            <Button variant="contained">Editar Perfil</Button>
+            <Button variant="outlined" onClick={() => {
+              setModal({
+                ...modal,
+                email: true
+              })
+            }}>Atualizar Email</Button>
+            <Button variant="outlined" onClick={() => {
+              setModal({
+                ...modal,
+                senha: true
+              })
+
+            }}>Atualizar Senha</Button>
+            <Button variant="contained">Comprar Fichas</Button>
+          </Box>
+        </Box>
+      }
+      {handleModal()}
     </Container>
   );
 }

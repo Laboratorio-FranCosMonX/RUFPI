@@ -1,9 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Card, CardContent, CardHeader, Container, Divider, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, CardHeader, Checkbox, Container, Divider, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api/api";
 import { userRegisterFormData, userRegisterSchema } from "../utils/schemas/UserRegisterSchema";
 
 const Cadastro = () => {
@@ -27,18 +26,8 @@ const Cadastro = () => {
    * @param data 
    */
   const onSubmit: SubmitHandler<userRegisterFormData> = async (data) => {
-    await api
-      .post("/usuario", data)
-      .then(() => {
-        alert("registrado com sucesso")
-        setTimeout(() => {//ir para a tela de login
-          navigate('/')
-        }, 1000);
-      })
-      .catch((erro) => {
-        console.log(erro)
-        alert("falha ao registrar usuario")
-      })
+    console.log(data)
+
   }
 
   return (
@@ -136,8 +125,14 @@ const Cadastro = () => {
                   required
                   fullWidth
                 />
+                <FormControlLabel
+                  control={<Checkbox {...register("nutricionista")} />}
+                  label="Marque essa caixa se você for assumir o papel de nutricionista."
+                />
                 <Box display={'flex'} justifyContent={"space-between"}>
-                  <Button variant="contained">Cancelar</Button>
+                  <Button variant="contained" onClick={() => {
+                    navigate('/');
+                  }}>Cancelar</Button>
                   <Button variant="contained" type="submit">Confirmar solicitação</Button>
                 </Box>
               </>

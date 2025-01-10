@@ -29,3 +29,10 @@ body {
   z-index: -1;
   opacity: 25%;
 }
+
+.global-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

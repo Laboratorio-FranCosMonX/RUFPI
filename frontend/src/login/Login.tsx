@@ -27,8 +27,15 @@ export default function Login() {
   const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
     await api
       .get(`/usuario/${data.id}`)
-      .then(() => {
+      .then((response) => {
         alert("Login efetuado com sucesso")
+        api.defaults.data = {//salvando alguns dados
+          user: {
+            id: data.id,
+            nome: response.data.nome
+          }
+        }
+        console.log(api.defaults.data)
         setTimeout(() => {//ir para a tela de login
           navigate('/home')
         }, 1000);

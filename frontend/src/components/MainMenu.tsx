@@ -1,9 +1,13 @@
 import { Avatar, Box, Button, Divider, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/api/api";
 
 const MainMenu = () => {
   const navigate = useNavigate();
+
+  const [inicializando, setInicializando] = useState(false)
+  const [inicial, setInicial] = useState("")
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -12,6 +16,21 @@ const MainMenu = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    if (!inicializando) {
+      setTimeout(() => {
+        setInicializando(true);
+        try {
+          setInicial(api.defaults.data.user.nome[0])
+        } catch (e) {
+          alert("Houve um problema ao carregar os dados, contate o desenvolvedor para corrigir o problema.")
+          api.defaults.data = null
+          navigate("/")
+        }
+      }, 200)
+    }
+  }, [inicializando])
 
   return (
     <React.Fragment>
@@ -37,7 +56,7 @@ const MainMenu = () => {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
           >
-            <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+            <Avatar sx={{ width: 32, height: 32 }}>{inicial}</Avatar>
           </IconButton>
         </Tooltip>
       </Box>

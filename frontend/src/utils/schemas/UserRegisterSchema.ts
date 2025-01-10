@@ -11,6 +11,7 @@ export const userRegisterSchema = z
     id: z.string().min(1, { message: 'Este campo não pode estar vazio.' })
       .max(20, { message: 'O campo não pode ultrapassar mais que 20 digitos.' }),
     tipo: z.number(),
+    nutricionista: z.boolean(),
     email: z.string().email({ message: "O email é inválido." })
       .max(50, { message: 'O campo não pode ultrapassar mais que 50 caracteres.' }),
     senha: z.string().min(6, { message: 'A senha deve conter, no mínimo, 6 caracteres.' })
