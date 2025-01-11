@@ -7,6 +7,41 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+@app.errorhandler(400)
+def handle_bad_request(error):
+    return jsonify({
+        "error": "Bad Request",
+        "message": str(error.description) if error.description else "The request could not be understood by the server."
+    }), 400
+
+@app.errorhandler(404)
+def handle_not_found(error):
+    return jsonify({
+        "error": "Not Found",
+        "message": "The requested resource was not found on the server."
+    }), 404
+
+@app.errorhandler(405)
+def handle_method_not_allowed(error):
+    return jsonify({
+        "error": "Method Not Allowed",
+        "message": f"The method {error.method} is not allowed for the requested URL."
+    }), 405
+
+@app.errorhandler(500)
+def handle_internal_server_error(error):
+    return jsonify({
+        "error": "Internal Server Error",
+        "message": "An unexpected error occurred on the server."
+    }), 500
+
+@app.errorhandler(Exception)
+def handle_exception(error):
+    return jsonify({
+        "error": "An unexpected error occurred",
+        "message": str(error)
+    }), 500
+
 class Tipo(db.Model):
     __tablename__ = 'tipos'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -30,7 +65,6 @@ class Usuario(db.Model):
 
     tipo = db.relationship('Tipo', backref='usuarios')
 
-# Novos modelos
 class Cardapio(db.Model):
     __tablename__ = 'cardapios'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
