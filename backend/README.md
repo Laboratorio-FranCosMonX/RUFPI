@@ -65,23 +65,24 @@ Esta é uma API em Flask simples que fornece endpoints para gerenciar os dados d
   ]
   ```
 
-#### **Obter Usuário por ID**
-- **URL:** `/usuarios/<int:id>`
-- **Método:** `GET`
-- **Resposta:**
+#### Obter Usuário por ID
+- **URL**: `/usuarios/<int:id>`
+- **Método**: `GET`
+- **Resposta**:
   ```json
   {
-    "id": 1,
-    "matricula_siapi": 123456,
-    "nome": "João Silva",
-    "email": "joao.silva@exemplo.com",
-    "cpf": 987654321,
-    "senha": "senha_hash",
-    "tipo": "Administrador",
-    "is_nutricionista": false,
-    "created_at": "2025-01-10T12:00:00",
-    "updated_at": "2025-01-10T12:00:00"
+      "id": 1,
+      "matricula_siapi": 123456,
+      "nome": "João Silva",
+      "email": "joao.silva@exemplo.com",
+      "cpf": 987654321,
+      "senha": "senha_hash",
+      "tipo": "Administrador",
+      "is_nutricionista": false,
+      "created_at": "2025-01-10T12:00:00",
+      "updated_at": "2025-01-10T12:00:00"
   }
+  ```
 
 #### Criar um Usuário
 - **URL**: `/usuarios`
@@ -137,4 +138,107 @@ Esta é uma API em Flask simples que fornece endpoints para gerenciar os dados d
       "message": "Deducted 5 fichas from user 1",
       "fichas": 5
   }
+  ```
+
+### 3. Cardápio
+
+#### Criar um Cardápio
+- **URL**: `/cardapios`
+- **Método**: `POST`
+- **Corpo da requisição**:
+  ```json
+  {
+      "descricao": "string",
+      "data": "YYYY-MM-DD",
+      "anotacao": "string"
+  }
+  ```
+- **Resposta**:
+  ```json
+  {
+      "message": "Cardápio created successfully"
+  }
+  ```
+
+#### Obter Cardápios
+- **URL**: `/cardapios`
+- **Método**: `GET`
+- **Resposta**:
+  ```json
+  [
+      {
+          "id": 1,
+          "descricao": "string",
+          "data": "YYYY-MM-DD",
+          "anotacao": "string",
+          "created_at": "2025-01-10T12:00:00",
+          "updated_at": "2025-01-10T12:00:00"
+      }
+  ]
+  ```
+
+### 4. Pratos
+
+#### Criar um Prato
+- **URL**: `/pratos`
+- **Método**: `POST`
+- **Corpo da requisição**:
+  ```json
+  {
+      "nome": "string"
+  }
+  ```
+- **Resposta**:
+  ```json
+  {
+      "message": "Prato created successfully"
+  }
+  ```
+
+#### Obter Pratos
+- **URL**: `/pratos`
+- **Método**: `GET`
+- **Resposta**:
+  ```json
+  [
+      {
+          "id": 1,
+          "nome": "string",
+          "created_at": "2025-01-10T12:00:00",
+          "updated_at": "2025-01-10T12:00:00"
+      }
+  ]
+  ```
+
+### 5. Ingredientes
+
+#### Criar um Ingrediente
+- **URL**: `/ingredientes`
+- **Método**: `POST`
+- **Corpo da requisição**:
+  ```json
+  {
+      "nome": "string"
+  }
+  ```
+- **Resposta**:
+  ```json
+  {
+      "message": "Ingrediente created successfully"
+  }
+  ```
+
+#### Obter Ingredientes
+- **URL**: `/ingredientes`
+- **Método**: `GET`
+- **Resposta**:
+  ```json
+  [
+      {
+          "id": 1,
+          "nome": "string",
+          "created_at": "2025-01-10T12:00:00",
+          "updated_at": "2025-01-10T12:00:00"
+      }
+  ]
   ```
