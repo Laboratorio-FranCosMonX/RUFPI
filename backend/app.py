@@ -30,8 +30,55 @@ class Usuario(db.Model):
 
     tipo = db.relationship('Tipo', backref='usuarios')
 
+# Novos modelos
+class Cardapio(db.Model):
+    __tablename__ = 'cardapios'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    descricao = db.Column(db.String(255), nullable=False)
+    data = db.Column(db.Date, nullable=False)
+    anotacao = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Prato(db.Model):
+    __tablename__ = 'pratos'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nome = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Ingrediente(db.Model):
+    __tablename__ = 'ingredientes'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nome = db.Column(db.String(100), nullable=False)
+
 with app.app_context():
     db.create_all()
+
+@app.route('/usuarios', methods=['POST'])
+def create_usuario():
+    data = request.get_json()
+    tipo = Tipo.query.filter_by(tipo=data['tipo']).first()
+    if not tipo:
+        return jsonify({'message': 'Tipo not found'}), 404
+    existing_user = Usuario.query.filter_by(cpf=data['cpf']).first()
+    if existing_user:
+        return jsonify({'error': 'CPF já cadastrado'}), 400
+
+    usuario = Usuario(
+        matricula_siapi=data['matricula_siapi'],
+        nome=data['nome'],
+        email=data['email'],
+        cpf=data['cpf'],
+        senha=data['senha'],
+        tipo_id=tipo.id,
+        is_nutricionista=data.get('is_nutricionista', False),
+        fichas=0
+    )
+
+    db.session.add(usuario)
+    db.session.commit()
+    return jsonify({'message': 'Usuario created successfully'}), 201
 
 @app.route('/usuarios', methods=['GET'])
 def get_usuarios():
@@ -67,28 +114,6 @@ def get_usuario(id):
         'created_at': usuario.created_at,
         'updated_at': usuario.updated_at
     })
-
-@app.route('/usuarios', methods=['POST'])
-def create_usuario():
-    data = request.get_json()
-    tipo = Tipo.query.filter_by(tipo=data['tipo']).first()
-    if not tipo:
-        return jsonify({'message': 'Tipo not found'}), 404
-
-    usuario = Usuario(
-        matricula_siapi=data['matricula_siapi'],
-        nome=data['nome'],
-        email=data['email'],
-        cpf=data['cpf'],
-        senha=data['senha'],
-        tipo_id=tipo.id,
-        is_nutricionista=data.get('is_nutricionista', False),
-        fichas=0
-    )
-
-    db.session.add(usuario)
-    db.session.commit()
-    return jsonify({'message': 'Usuario created successfully'}), 201
 
 @app.route('/tipos', methods=['POST'])
 def create_tipo():
@@ -132,6 +157,73 @@ def deduct_fichas(id):
     db.session.commit()
 
     return jsonify({'message': f'Deducted {fichas_to_deduct} fichas from user {id}', 'fichas': user.fichas}), 200
+
+@app.route('/cardapios', methods=['POST'])
+def create_cardapio():
+    data = request.get_json()
+    cardapio = Cardapio(
+        descricao=data['descricao'],
+        data=datetime.strptime(data['data'], '%Y-%m-%d').date(),
+        anotacao=data.get('anotacao', '')
+    )
+    db.session.add(cardapio)
+    db.session.commit()
+    return jsonify({'message': 'Cardapio created successfully'}), 201
+
+@app.route('/cardapios', methods=['GET'])
+def get_cardapios():
+    cardapios = Cardapio.query.all()
+    result = []
+    for cardapio in cardapios:
+        result.append({
+            'id': cardapio.id,
+            'descricao': cardapio.descricao,
+            'data': cardapio.data,
+            'anotacao': cardapio.anotacao,
+            'created_at': cardapio.created_at,
+            'updated_at': cardapio.updated_at
+        })
+    return jsonify(result)
+
+@app.route('/pratos', methods=['POST'])
+def create_prato():
+    data = request.get_json()
+    prato = Prato(nome=data['nome'])
+    db.session.add(prato)
+    db.session.commit()
+    return jsonify({'message': 'Prato created successfully'}), 201
+
+@app.route('/pratos', methods=['GET'])
+def get_pratos():
+    pratos = Prato.query.all()
+    result = []
+    for prato in pratos:
+        result.append({
+            'id': prato.id,
+            'nome': prato.nome,
+            'created_at': prato.created_at,
+            'updated_at': prato.updated_at
+        })
+    return jsonify(result)
+
+@app.route('/ingredientes', methods=['POST'])
+def create_ingrediente():
+    data = request.get_json()
+    ingrediente = Ingrediente(nome=data['nome'])
+    db.session.add(ingrediente)
+    db.session.commit()
+    return jsonify({'message': 'Ingrediente created successfully'}), 201
+
+@app.route('/ingredientes', methods=['GET'])
+def get_ingredientes():
+    ingredientes = Ingrediente.query.all()
+    result = []
+    for ingrediente in ingredientes:
+        result.append({
+            'id': ingrediente.id,
+            'nome': ingrediente.nome
+        })
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)
