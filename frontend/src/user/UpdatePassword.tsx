@@ -6,7 +6,6 @@ import api from "../utils/api/api";
 import { AtualizarSenhaFormData, AtualizarSenhaSchema } from "../utils/schemas/UpdatePasswordSchema";
 
 interface AtualizarSenhaParams {
-  atualizarDados: () => void;
   fecharModal: () => void;
 }
 
@@ -36,6 +35,7 @@ const AtualizarSenha = ({ fecharModal, password, updateAt, id }: AtualizarSenhaP
     api.patch(`/usuario/${id}`, dados)
       .then(() => {
         console.log("Atualizado com sucesso")
+        fecharModal()
       })
       .catch((e) => {
         console.log("Erro ao atualizar senha")
@@ -58,9 +58,20 @@ const AtualizarSenha = ({ fecharModal, password, updateAt, id }: AtualizarSenhaP
       }}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="global-form">
+        <Button
+          onClick={fecharModal}
+          sx={{
+            backgroundColor: 'red',
+            color: "white",
+            top: '10px',
+            right: '0px',
+            display: 'absolute',
+            padding: '0px',
+          }}
+          variant="contained">X</Button>
         <Card sx={{
           backgroundColor: "White",
-          width: { xs: '100%', sm: '75%', md: '50%', lg: '40%', xl: '30%' }
+          width: { xs: '100%', sm: '80%', md: '80%', lg: '90%', xl: '90%' }
         }}>
           <CardHeader title="Alterar Senha" subheader={`Atualizado em ${updateAt}`} />
           <CardContent

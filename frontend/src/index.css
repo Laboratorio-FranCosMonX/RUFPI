@@ -31,8 +31,9 @@ body {
 }
 
 .global-form {
-  width: 100%;
+  width: max-content;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }

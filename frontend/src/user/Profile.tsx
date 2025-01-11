@@ -4,12 +4,14 @@ import MainMenu from "../components/MainMenu";
 import api from "../utils/api/api";
 import AtualizarEmail from "./UpdateEmail";
 import AtualizarSenha from "./UpdatePassword";
+import AtualizarPerfil from "./UpdateProfile";
 
 interface Usuario {
   nome: string
   id: string
   email: string
   tipo: number
+  nutricionista: boolean
 }
 
 interface ModalInterface {
@@ -22,7 +24,7 @@ interface ModalInterface {
 const Perfil = () => {
 
   const [profile, setProfile] = useState<Usuario>({
-    email: '', id: '', nome: '', tipo: -1
+    email: '', id: '', nome: '', tipo: -1, nutricionista: false
   })
   const [profileInicializado, setProfileInicializado] = useState(false)
   const [dadosCarregados, setDadosCarregados] = useState(false)
@@ -75,8 +77,19 @@ const Perfil = () => {
           password={"teste"}
         />
       )
+
+    if (modal.dadosDoUsuario)
+      return (
+        <AtualizarPerfil
+          fecharModal={callbackCloseModal}
+          atualizarDados={callbackModalOK}
+          updateAt={Date.now().toLocaleString()}
+          eNutricionista={profile.nutricionista}
+          id={profile.id}
+        />
+      )
     return (
-      <AtualizarSenha fecharModal={callbackCloseModal} atualizarDados={callbackModalOK} updateAt={Date.now().valueOf() + " "} password={"teste"} id={profile.id} />
+      <AtualizarSenha fecharModal={callbackCloseModal} updateAt={Date.now().valueOf() + " "} password={"teste"} id={profile.id} />
     )
   }
 
@@ -113,7 +126,12 @@ const Perfil = () => {
             </Box>
           </Grid2>
           <Box display={"flex"} justifyContent={"space-evenly"} width={'100%'} marginTop={3}>
-            <Button variant="contained">Editar Perfil</Button>
+            <Button variant="contained" onClick={() => {
+              setModal({
+                ...modal,
+                dadosDoUsuario: true
+              })
+            }}>Editar Perfil</Button>
             <Button variant="outlined" onClick={() => {
               setModal({
                 ...modal,
