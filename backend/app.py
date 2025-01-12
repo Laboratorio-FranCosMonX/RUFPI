@@ -59,7 +59,6 @@ class Usuario(db.Model):
     tipo_id = db.Column(db.Integer, db.ForeignKey('tipos.id'), nullable=False)
     is_nutricionista = db.Column(db.Boolean, default=False)
     fichas = db.Column(db.Integer, nullable=False)
-
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -148,6 +147,47 @@ def get_usuario(id):
         'created_at': usuario.created_at,
         'updated_at': usuario.updated_at
     })
+
+@app.route('/usuarios/matricula/<int:matricula_siapi>', methods=['GET'])
+def get_usuario_by_matricula(matricula_siapi):
+    usuario = Usuario.query.filter_by(matricula_siapi=matricula_siapi).first()
+    if usuario:
+        return jsonify({
+            "id": usuario.id,
+            "matricula_siapi": usuario.matricula_siapi,
+            "nome": usuario.nome,
+            "email": usuario.email,
+            "cpf": usuario.cpf,
+            "tipo_id": usuario.tipo_id,
+            "is_nutricionista": usuario.is_nutricionista,
+            "fichas": usuario.fichas,
+            "created_at": usuario.created_at,
+            "updated_at": usuario.updated_at
+        }), 200
+    else:
+        return jsonify({"error": "Usuario not found"}), 404
+
+@app.route('/usuarios/tipo/<int:tipo_id>', methods=['GET'])
+def get_usuarios_by_tipo(tipo_id):
+    usuarios = Usuario.query.filter_by(tipo_id=tipo_id).all()
+    if usuarios:
+        return jsonify([
+            {
+                "id": usuario.id,
+                "matricula_siapi": usuario.matricula_siapi,
+                "nome": usuario.nome,
+                "email": usuario.email,
+                "cpf": usuario.cpf,
+                "tipo_id": usuario.tipo_id,
+                "is_nutricionista": usuario.is_nutricionista,
+                "fichas": usuario.fichas,
+                "created_at": usuario.created_at,
+                "updated_at": usuario.updated_at
+            }
+            for usuario in usuarios
+        ]), 200
+    else:
+        return jsonify({"error": "No usuarios found for the given tipo_id"}), 404
 
 @app.route('/tipos', methods=['POST'])
 def create_tipo():
