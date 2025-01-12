@@ -1,0 +1,40 @@
+@startuml
+
+left to right direction
+
+actor discente
+actor administrador
+actor nutricionista
+usecase logar
+usecase deslogar
+usecase cadastrar
+usecase gerCadastro as "Ger. de cadastro"
+usecase gerPerfilLimitado as "Ger. de perfil simples"
+usecase gerPerfil as "Ger. perfil"
+usecase gerCardapio as "Ger. Cardapio"
+usecase addAnotacaoCardapio as "Add anotação"
+
+administrador ---> nutricionista
+discente --> nutricionista
+
+cadastrar .> logar
+gerCadastro .> cadastrar
+gerPerfil .> gerPerfilLimitado
+gerCardapio --addAnotacaoCardapio
+
+discente -- cadastrar
+discente -- logar
+discente -- deslogar
+discente -- gerPerfilLimitado
+
+administrador -- gerCadastro
+administrador -- gerPerfil
+administrador -- logar
+administrador -- deslogar
+administrador -- cadastrar
+administrador -- gerPerfilLimitado
+administrador -- gerCardapio
+
+nutricionista -- addAnotacaoCardapio
+
+@enduml

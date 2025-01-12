@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Card, CardContent, CardHeader, Divider, Grid2, Modal, TextField, Typography } from "@mui/material";
+import moment from "moment";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import api from "../utils/api/api";
@@ -9,7 +10,7 @@ interface AtualizarSenhaParams {
   fecharModal: () => void;
 }
 
-const AtualizarSenha = ({ fecharModal, password, updateAt, id }: AtualizarSenhaParams & { password: String, updateAt: string, id: string }) => {
+const AtualizarSenha = ({ fecharModal, password, updateAt, id }: AtualizarSenhaParams & { password: String, updateAt: Date, id: string }) => {
   const [modalOpen, setModalOpen] = useState(true)
 
   const {
@@ -73,7 +74,7 @@ const AtualizarSenha = ({ fecharModal, password, updateAt, id }: AtualizarSenhaP
           backgroundColor: "White",
           width: { xs: '100%', sm: '80%', md: '80%', lg: '90%', xl: '90%' }
         }}>
-          <CardHeader title="Alterar Senha" subheader={`Atualizado em ${updateAt}`} />
+          <CardHeader title="Alterar Senha" subheader={`Atualizado em ${moment(updateAt.getTime()).format('DD/MM/YYYY HH:MM:SS')}`} />
           <CardContent
             sx={{
               padding: "10px",

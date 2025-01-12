@@ -34,7 +34,7 @@ const MainMenu = () => {
 
   return (
     <React.Fragment>
-      <Box sx={{ display: 'flex', paddingTop: '7px', width: "100%", justifyContent: 'space-between', alignItems: 'center', textAlign: 'center', borderBottom: '1px solid gray' }}>
+      <Box sx={{ display: 'flex', paddingTop: '7px', width: "100%", maxWidth: '100vw', justifyContent: 'space-between', alignItems: 'center', textAlign: 'center', borderBottom: '1px solid gray' }}>
         <Button variant="text" size={"large"} sx={{
           ':hover': {
             backgroundColor: 'none'

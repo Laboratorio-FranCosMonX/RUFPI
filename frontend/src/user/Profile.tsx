@@ -72,7 +72,7 @@ const Perfil = () => {
         <AtualizarEmail
           fecharModal={callbackCloseModal}
           atualizarDados={callbackModalOK}
-          updateAt={Date.now().toLocaleString()}
+          updateAt={new Date(Date.now())}
           id={profile.id}
           password={"teste"}
         />
@@ -83,13 +83,13 @@ const Perfil = () => {
         <AtualizarPerfil
           fecharModal={callbackCloseModal}
           atualizarDados={callbackModalOK}
-          updateAt={Date.now().toLocaleString()}
+          updateAt={new Date(Date.now())}
           eNutricionista={profile.nutricionista}
           id={profile.id}
         />
       )
     return (
-      <AtualizarSenha fecharModal={callbackCloseModal} updateAt={Date.now().valueOf() + " "} password={"teste"} id={profile.id} />
+      <AtualizarSenha fecharModal={callbackCloseModal} updateAt={new Date(Date.now())} password={"teste"} id={profile.id} />
     )
   }
 

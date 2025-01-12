@@ -22,18 +22,20 @@ class Usuario{
 
 class Cardapio{
     -id: number
-    -descricao: string
     -data: Date
-    -anotacao: string
     -createAt: Date
     -updateAt: Date
 }
 
+class Refeicao{
+    -id: number
+    -tipo: string
+    -anotacao: string
+}
+
 class Prato{
     -id: number
-    -nome: string
-    -createAt: Date
-    -updateAt: Date
+    -preferencia_Alimentar: string
 }
 
 class Igrediente{
@@ -43,7 +45,8 @@ class Igrediente{
 
 Usuario --- Tipo: 1 - 1
 Usuario --- Cardapio: n - n
-Cardapio --- Prato: n - n
+Cardapio -- Refeicao: n - n
+Refeicao -- Prato: n - n
 Prato --- Igrediente: n - n
 
 @enduml
