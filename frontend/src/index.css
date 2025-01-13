@@ -12,6 +12,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  position: relative;
   width: 100vw;
   min-height: 100vh;
 }
@@ -23,11 +24,11 @@ body {
 }
 
 .image-paper-profile {
-  position: absolute;
   width: 100%;
+  max-width: max-content;
   height: 100%;
   z-index: -1;
-  opacity: 25%;
+  opacity: 5%;
 }
 
 .global-form {

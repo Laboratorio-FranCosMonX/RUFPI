@@ -1,4 +1,4 @@
-import { Box, Button, Container, Divider, Grid2, LinearProgress, Typography } from "@mui/material";
+import { Avatar, Box, Button, Container, Divider, Grid2, LinearProgress, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import MainMenu from "../components/MainMenu";
 import api from "../utils/api/api";
@@ -103,7 +103,7 @@ const Perfil = () => {
       {
         !dadosCarregados &&
         <Box sx={{
-          marginTop: '20px'
+          marginTop: '70px'
         }}>
           <LinearProgress />
           <Typography>Carregando</Typography>
@@ -112,40 +112,42 @@ const Perfil = () => {
         ||
 
         !!dadosCarregados && profile !== undefined &&
-        <Box width={"100%"} paddingTop={3} display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'}>
-          <Grid2 display={"flex"} justifyContent={'space-between'} width={'70%'} border={"1px solid gray"} borderRadius={'19px'} >
-            <Box display="flex" flexDirection={"column"} gap={1} margin={2} width={'50%'} position={"relative"}>
-              <Typography variant="h5">{profile.nome}</Typography>
-              <Typography variant="body1">Matricula: {profile.id}</Typography>
-              <Typography variant="body1">Email: {profile.email}</Typography>
-              <Typography variant="body1">Fichas: 1</Typography>
-              <img className="image-paper-profile" src="papelDeParedePerfilUsuario.jpg" alt="" />
+        <Box width={"100%"} maxWidth={'1000px'} paddingTop={3} display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} marginTop={'70px'}>
+          <Grid2 display={"flex"} justifyContent={'space-between'} width={'70%'} border={"1px solid gray"} borderRadius={'19px'}>
+            <Box display="flex" flexDirection={"column"} gap={1} margin={2} width={'100%'} position={"relative"}>
+              <Typography variant="h5" >{profile.nome}</Typography>
+              <Typography variant="body1" >Matricula: {profile.id}</Typography>
+              <Typography variant="body1" >Email: {profile.email}</Typography>
+              <Typography variant="body1" >Fichas: 1</Typography>
+              <Box position={'absolute'} margin={'auto'} zIndex={-1} width={'100%'} height={'100%'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                <img className="image-paper-profile" src="papelDeParedePerfilUsuario.jpg" alt="" />
+              </Box>
             </Box>
-            <Box>
-              <img className="image-profile" src="imageProfile.jpg" alt="" />
+            <Box display={'flex'} justifyContent={'center'} alignItems={'center'} maxWidth={"140px"}>
+              <Avatar src="imageProfile.jpg" sx={{ maxWidth: '100%', height: 'auto', width: '100%' }} />
             </Box>
           </Grid2>
-          <Box display={"flex"} justifyContent={"space-evenly"} width={'100%'} marginTop={3}>
-            <Button variant="contained" onClick={() => {
+          <Box display={"flex"} justifyContent={"center"} alignItems={'center'} flexWrap={"wrap"} width={'100%'} marginTop={3} gap={'10px'}>
+            <Button sx={{ width: '180px' }} variant="contained" onClick={() => {
               setModal({
                 ...modal,
                 dadosDoUsuario: true
               })
             }}>Editar Perfil</Button>
-            <Button variant="outlined" onClick={() => {
+            <Button sx={{ width: '180px' }} variant="outlined" onClick={() => {
               setModal({
                 ...modal,
                 email: true
               })
             }}>Atualizar Email</Button>
-            <Button variant="outlined" onClick={() => {
+            <Button sx={{ width: '180px' }} variant="outlined" onClick={() => {
               setModal({
                 ...modal,
                 senha: true
               })
 
             }}>Atualizar Senha</Button>
-            <Button variant="contained">Comprar Fichas</Button>
+            <Button sx={{ width: '180px' }} variant="contained">Comprar Fichas</Button>
           </Box>
         </Box>
       }

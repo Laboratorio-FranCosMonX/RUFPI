@@ -29,7 +29,15 @@ const Home = () => {
         backgroundColor: 'black',
         marginBottom: '15px'
       }} />
-      <Box width={'100%'} display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'}>
+      <Box width={'100%'} display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} position={'relative'} marginTop={'50px'}>
+        <Button
+          variant="contained"
+          sx={{
+            position: 'fixed', right: '15px', top: '60px', zIndex: '10', opacity: `10%`, ':hover': {
+              opacity: `100%`
+            }
+          }}
+        >Novo Cardápio</Button>
         <List
           sx={{ width: '100%' }}
         >
