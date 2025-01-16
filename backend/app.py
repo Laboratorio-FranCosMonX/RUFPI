@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_cors import CORS
@@ -7,6 +7,7 @@ app = Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'chave-de-teste'
 db = SQLAlchemy(app)
 
 @app.errorhandler(400)
@@ -114,6 +115,21 @@ def create_usuario():
     db.session.add(usuario)
     db.session.commit()
     return jsonify({'message': 'Usuario created successfully'}), 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = Usuario.query.filter_by(email=data['email']).first()
+    if user and user.senha == data['senha']:
+        session['user_id'] = user.id
+        session['is_nutricionista'] = user.is_nutricionista
+        return jsonify({'message': 'Login successful'}), 200
+    return jsonify({'error': 'Invalid credentials'}), 401
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({'message': 'User logged out successfully'}), 200
 
 @app.route('/usuarios/<int:id>', methods=['PUT'])
 def update_usuario(id):
@@ -287,6 +303,9 @@ def deduct_fichas(id):
 
 @app.route('/cardapios', methods=['POST'])
 def create_cardapio():
+    if not session.get('is_nutricionista'):
+        return jsonify({'message': 'User is not nutricionista'}), 403
+
     data = request.get_json()
     cardapio = Cardapio(
         descricao=data['descricao'],
