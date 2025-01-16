@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_cors import CORS
@@ -7,6 +7,7 @@ app = Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'chave-de-teste'
 db = SQLAlchemy(app)
 
 @app.errorhandler(400)
@@ -95,7 +96,7 @@ def create_usuario():
     data = request.get_json()
     tipo = Tipo.query.filter_by(tipo=data['tipo']).first()
     if not tipo:
-        return jsonify({'message': 'Tipo not found'}), 404
+        return jsonify({'message': 'Tipo not found'}), 401
     existing_user = Usuario.query.filter_by(cpf=data['cpf']).first()
     if existing_user:
         return jsonify({'error': 'CPF já cadastrado'}), 400
@@ -114,6 +115,72 @@ def create_usuario():
     db.session.add(usuario)
     db.session.commit()
     return jsonify({'message': 'Usuario created successfully'}), 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = Usuario.query.filter_by(email=data['email']).first()
+    if user and user.senha == data['senha']:
+        session['user_id'] = user.id
+        session['is_nutricionista'] = user.is_nutricionista
+        return jsonify({'message': 'Login successful'}), 200
+    return jsonify({'error': 'Invalid credentials'}), 401
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({'message': 'User logged out successfully'}), 200
+
+@app.route('/usuarios/<int:id>', methods=['PUT'])
+def update_usuario(id):
+    usuario = Usuario.query.get_or_404(id)
+
+    data = request.get_json()
+
+    if 'nome' in data:
+        usuario.nome = data['nome']
+    if 'email' in data:
+        existing_user = Usuario.query.filter_by(email=data['email']).first()
+        if existing_user and existing_user.id != id:
+            return jsonify({'error': 'Email já cadastrado'}), 400
+        usuario.email = data['email']
+    if 'cpf' in data:
+        existing_user = Usuario.query.filter_by(cpf=data['cpf']).first()
+        if existing_user and existing_user.id != id:
+            return jsonify({'error': 'CPF já cadastrado'}), 400
+        usuario.cpf = data['cpf']
+    if 'senha' in data:
+        usuario.senha = data['senha']
+    if 'tipo' in data:
+        tipo = Tipo.query.filter_by(tipo=data['tipo']).first()
+        if not tipo:
+            return jsonify({'message': 'Tipo not found'}), 401
+        usuario.tipo_id = tipo.id
+    if 'is_nutricionista' in data:
+        usuario.is_nutricionista = data['is_nutricionista']
+    if 'fichas' in data:
+        try:
+            usuario.fichas = int(data['fichas'])
+        except ValueError:
+            return jsonify({'error': 'Invalid fichas value'}), 400
+
+    db.session.commit()
+    return jsonify({
+        'message': 'Usuario updated successfully',
+        'usuario': {
+            'id': usuario.id,
+            'matricula_siapi': usuario.matricula_siapi,
+            'nome': usuario.nome,
+            'email': usuario.email,
+            'cpf': usuario.cpf,
+            'senha': usuario.senha,
+            'tipo': usuario.tipo.tipo,
+            'is_nutricionista': usuario.is_nutricionista,
+            'fichas': usuario.fichas,
+            'created_at': usuario.created_at,
+            'updated_at': usuario.updated_at
+        }
+    }), 200
 
 @app.route('/usuarios', methods=['GET'])
 def get_usuarios():
@@ -236,6 +303,9 @@ def deduct_fichas(id):
 
 @app.route('/cardapios', methods=['POST'])
 def create_cardapio():
+    if not session.get('is_nutricionista'):
+        return jsonify({'message': 'User is not nutricionista'}), 403
+
     data = request.get_json()
     cardapio = Cardapio(
         descricao=data['descricao'],
