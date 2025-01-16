@@ -96,7 +96,7 @@ def create_usuario():
     data = request.get_json()
     tipo = Tipo.query.filter_by(tipo=data['tipo']).first()
     if not tipo:
-        return jsonify({'message': 'Tipo not found'}), 404
+        return jsonify({'message': 'Tipo not found'}), 401
     existing_user = Usuario.query.filter_by(cpf=data['cpf']).first()
     if existing_user:
         return jsonify({'error': 'CPF já cadastrado'}), 400
@@ -154,7 +154,7 @@ def update_usuario(id):
     if 'tipo' in data:
         tipo = Tipo.query.filter_by(tipo=data['tipo']).first()
         if not tipo:
-            return jsonify({'message': 'Tipo not found'}), 404
+            return jsonify({'message': 'Tipo not found'}), 401
         usuario.tipo_id = tipo.id
     if 'is_nutricionista' in data:
         usuario.is_nutricionista = data['is_nutricionista']
