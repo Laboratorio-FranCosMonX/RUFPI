@@ -266,6 +266,26 @@ def create_tipo():
     db.session.commit()
     return jsonify({'message': 'Tipo created successfully'}), 201
 
+@app.route('/tipos/id/<int:id>', methods=['GET'])
+def get_tipo_by_id(id):
+    tipo = Tipo.query.get_or_404(id)
+    return jsonify({
+        'id': tipo.id,
+        'tipo': tipo.tipo,
+        'descricao': tipo.descricao
+    }), 200
+
+@app.route('/tipos/nome/<string:nome>', methods=['GET'])
+def get_tipo_by_nome(nome):
+    tipo = Tipo.query.filter_by(tipo=nome).first()
+    if not tipo:
+        return jsonify({'error': 'Tipo not found'}), 404
+    return jsonify({
+        'id': tipo.id,
+        'tipo': tipo.tipo,
+        'descricao': tipo.descricao
+    }), 200
+
 @app.route('/usuario/<int:id>/add_fichas', methods=['POST'])
 def add_fichas(id):
     user = Usuario.query.get(id)
