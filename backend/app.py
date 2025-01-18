@@ -194,7 +194,6 @@ def get_usuarios():
             'nome': usuario.nome,
             'email': usuario.email,
             'cpf': usuario.cpf,
-            'senha': usuario.senha,
             'tipo_id': usuario.tipo_id,
             'is_nutricionista': usuario.is_nutricionista,
             'created_at': usuario.created_at,
@@ -212,7 +211,6 @@ def get_usuario_by_id():
         'nome': usuario.nome,
         'email': usuario.email,
         'cpf': usuario.cpf,
-        'senha': usuario.senha,
         'tipo_id': usuario.tipo_id,
         'is_nutricionista': usuario.is_nutricionista,
         'created_at': usuario.created_at,
@@ -269,6 +267,18 @@ def create_tipo():
     db.session.add(nome)
     db.session.commit()
     return jsonify({'message': 'Tipo created successfully'}), 201
+
+@app.route('/tipos/all', methods=['GET'])
+def get_tipos():
+    tipos = Tipo.query.all()
+    result = []
+    for tipo in tipos:
+        result.append({
+            'id': tipo.id,
+            'nome': tipo.nome,
+            'descricao': tipo.descricao
+        })
+    return jsonify(result)
 
 @app.route('/tipos/id', methods=['GET'])
 def get_tipo_by_id():
