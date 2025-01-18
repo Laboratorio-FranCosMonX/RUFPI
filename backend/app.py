@@ -98,8 +98,12 @@ def login():
     if user and user.senha == data['senha']:
         session['user_id'] = user.id
         session['is_nutricionista'] = user.is_nutricionista
-        return jsonify({'message': 'Login successful'}), 200
-    return jsonify({'error': 'Invalid credentials'}), 401
+        return jsonify({
+            'message': 'Login successful',
+            'id': user.id,
+            'nome': user.nome
+        }), 200
+    return jsonify({'error': 'Invalid credentials'}), 400
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -111,7 +115,7 @@ def create_usuario():
     data = request.get_json()
     tipo = Tipo.query.filter_by(id=data['tipo_id']).first()
     if not tipo:
-        return jsonify({'message': 'Tipo not found'}), 401
+        return jsonify({'message': 'Tipo not found'}), 400
     existing_user = Usuario.query.filter_by(cpf=data['cpf']).first()
     if existing_user:
         return jsonify({'error': 'CPF já cadastrado'}), 400
@@ -155,7 +159,7 @@ def update_usuario():
     if 'tipo_id' in data:
         tipo = Tipo.query.filter_by(id=data['tipo_id']).first()
         if not tipo:
-            return jsonify({'message': 'Tipo not found'}), 401
+            return jsonify({'message': 'Tipo not found'}), 400
         usuario.tipo_id = tipo.id
     if 'is_nutricionista' in data:
         usuario.is_nutricionista = data['is_nutricionista']
