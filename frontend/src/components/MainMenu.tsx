@@ -102,9 +102,6 @@ const MainMenu = () => {
         }}>
           <Avatar /> Perfil
         </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Avatar /> Minha Conta
-        </MenuItem>
         <Divider />
         <MenuItem onClick={() => {
           navigate('/')

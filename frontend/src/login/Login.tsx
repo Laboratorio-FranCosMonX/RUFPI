@@ -26,12 +26,15 @@ export default function Login() {
    */
   const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
     await api
-      .get(`/usuario/${data.id}`)
+      .post(`/login`, {
+        email: data.email,
+        senha: data.senha
+      })
       .then((response) => {
         alert("Login efetuado com sucesso")
         api.defaults.data = {//salvando alguns dados
           user: {
-            id: data.id,
+            id: response.data.id,
             nome: response.data.nome
           }
         }
@@ -63,18 +66,16 @@ export default function Login() {
             gap: '15px'
           }}>
             <TextField
-              id={"id"}
-              label="Informe o número de matricula ou SIAPI."
-              type={"text"}
+              label="Informe o email cadastrado."
+              type={"email"}
               variant="outlined"
-              {...register("id")}
-              error={!!errors.id}
-              helperText={errors.id?.message}
+              {...register("email")}
+              error={!!errors.email}
+              helperText={errors.email?.message}
               required
               fullWidth
             />
             <TextField
-              id="senha"
               label="Senha"
               type={"password"}
               variant="outlined"

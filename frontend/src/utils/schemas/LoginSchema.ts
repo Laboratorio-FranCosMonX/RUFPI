@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const LoginSchema = z
   .object({
-    id: z.string().min(1, { message: 'Este campo não pode estar vazio.' })
-      .max(20, { message: 'O campo não pode ultrapassar mais que 20 digitos.' }),
+    email: z.string().min(1, { message: 'Este campo não pode estar vazio.' })
+      .email("Este campo deve conter um email válido."),
     senha: z.string().min(6, { message: 'A senha deve conter, no mínimo, 6 caracteres.' })
       .max(30, { message: 'O campo não pode ultrapassar mais que 30 caracteres.' })
   })
