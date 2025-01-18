@@ -48,12 +48,12 @@ def handle_exception(error):
 class Tipo(db.Model):
     __tablename__ = 'tipos'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    tipo = db.Column(db.String(50), nullable=False)
+    nome = db.Column(db.String(50), nullable=False)
     descricao = db.Column(db.String(255))
 
 class Usuario(db.Model):
     __tablename__ = 'usuarios'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     matricula_siapi = db.Column(db.Integer, unique=True, nullable=False)
     nome = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -91,10 +91,25 @@ class Ingrediente(db.Model):
 with app.app_context():
     db.create_all()
 
-@app.route('/usuarios', methods=['POST'])
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = Usuario.query.filter_by(email=data['email']).first()
+    if user and user.senha == data['senha']:
+        session['user_id'] = user.id
+        session['is_nutricionista'] = user.is_nutricionista
+        return jsonify({'message': 'Login successful'}), 200
+    return jsonify({'error': 'Invalid credentials'}), 401
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({'message': 'User logged out successfully'}), 200
+
+@app.route('/usuarios/create', methods=['POST'])
 def create_usuario():
     data = request.get_json()
-    tipo = Tipo.query.filter_by(tipo=data['tipo']).first()
+    tipo = Tipo.query.filter_by(id=data['tipo_id']).first()
     if not tipo:
         return jsonify({'message': 'Tipo not found'}), 401
     existing_user = Usuario.query.filter_by(cpf=data['cpf']).first()
@@ -116,26 +131,12 @@ def create_usuario():
     db.session.commit()
     return jsonify({'message': 'Usuario created successfully'}), 201
 
-@app.route('/login', methods=['POST'])
-def login():
+@app.route('/usuarios/update', methods=['PUT'])
+def update_usuario():
     data = request.get_json()
-    user = Usuario.query.filter_by(email=data['email']).first()
-    if user and user.senha == data['senha']:
-        session['user_id'] = user.id
-        session['is_nutricionista'] = user.is_nutricionista
-        return jsonify({'message': 'Login successful'}), 200
-    return jsonify({'error': 'Invalid credentials'}), 401
-
-@app.route('/logout', methods=['POST'])
-def logout():
-    session.clear()
-    return jsonify({'message': 'User logged out successfully'}), 200
-
-@app.route('/usuarios/<int:id>', methods=['PUT'])
-def update_usuario(id):
-    usuario = Usuario.query.get_or_404(id)
-
-    data = request.get_json()
+    if 'id' not in data:
+        return jsonify({'error': 'ID is required'}), 400
+    usuario = Usuario.query.get_or_404(data['id'])
 
     if 'nome' in data:
         usuario.nome = data['nome']
@@ -151,8 +152,8 @@ def update_usuario(id):
         usuario.cpf = data['cpf']
     if 'senha' in data:
         usuario.senha = data['senha']
-    if 'tipo' in data:
-        tipo = Tipo.query.filter_by(tipo=data['tipo']).first()
+    if 'tipo_id' in data:
+        tipo = Tipo.query.filter_by(id=data['tipo_id']).first()
         if not tipo:
             return jsonify({'message': 'Tipo not found'}), 401
         usuario.tipo_id = tipo.id
@@ -174,7 +175,7 @@ def update_usuario(id):
             'email': usuario.email,
             'cpf': usuario.cpf,
             'senha': usuario.senha,
-            'tipo': usuario.tipo.tipo,
+            'tipo_id': usuario.tipo.id,
             'is_nutricionista': usuario.is_nutricionista,
             'fichas': usuario.fichas,
             'created_at': usuario.created_at,
@@ -182,7 +183,7 @@ def update_usuario(id):
         }
     }), 200
 
-@app.route('/usuarios', methods=['GET'])
+@app.route('/usuarios/all', methods=['GET'])
 def get_usuarios():
     usuarios = Usuario.query.all()
     result = []
@@ -194,16 +195,17 @@ def get_usuarios():
             'email': usuario.email,
             'cpf': usuario.cpf,
             'senha': usuario.senha,
-            'tipo': usuario.tipo.tipo,
+            'tipo_id': usuario.tipo_id,
             'is_nutricionista': usuario.is_nutricionista,
             'created_at': usuario.created_at,
             'updated_at': usuario.updated_at
         })
     return jsonify(result)
 
-@app.route('/usuarios/<int:id>', methods=['GET'])
-def get_usuario(id):
-    usuario = Usuario.query.get_or_404(id)
+@app.route('/usuarios/id', methods=['GET'])
+def get_usuario_by_id():
+    data = request.get_json()
+    usuario = Usuario.query.get_or_404(data['id'])
     return jsonify({
         'id': usuario.id,
         'matricula_siapi': usuario.matricula_siapi,
@@ -211,15 +213,16 @@ def get_usuario(id):
         'email': usuario.email,
         'cpf': usuario.cpf,
         'senha': usuario.senha,
-        'tipo': usuario.tipo.tipo,
+        'tipo_id': usuario.tipo_id,
         'is_nutricionista': usuario.is_nutricionista,
         'created_at': usuario.created_at,
         'updated_at': usuario.updated_at
     })
 
-@app.route('/usuarios/matricula/<int:matricula_siapi>', methods=['GET'])
-def get_usuario_by_matricula(matricula_siapi):
-    usuario = Usuario.query.filter_by(matricula_siapi=matricula_siapi).first()
+@app.route('/usuarios/matricula', methods=['GET'])
+def get_usuario_by_matricula():
+    data = request.get_json()
+    usuario = Usuario.query.filter_by(matricula_siapi=data['matricula_siapi']).first()
     if usuario:
         return jsonify({
             "id": usuario.id,
@@ -236,9 +239,10 @@ def get_usuario_by_matricula(matricula_siapi):
     else:
         return jsonify({"error": "Usuario not found"}), 404
 
-@app.route('/usuarios/tipo/<int:tipo_id>', methods=['GET'])
-def get_usuarios_by_tipo(tipo_id):
-    usuarios = Usuario.query.filter_by(tipo_id=tipo_id).all()
+@app.route('/usuarios/tipo', methods=['GET'])
+def get_usuarios_by_tipo():
+    data = request.get_json()
+    usuarios = Usuario.query.filter_by(tipo_id=data['tipo_id']).all()
     if usuarios:
         return jsonify([
             {
@@ -258,37 +262,40 @@ def get_usuarios_by_tipo(tipo_id):
     else:
         return jsonify({"error": "No usuarios found for the given tipo_id"}), 404
 
-@app.route('/tipos', methods=['POST'])
+@app.route('/tipos/create', methods=['POST'])
 def create_tipo():
     data = request.get_json()
-    tipo = Tipo(tipo=data['tipo'], descricao=data['descricao'])
-    db.session.add(tipo)
+    nome = Tipo(nome=data['nome'], descricao=data['descricao'])
+    db.session.add(nome)
     db.session.commit()
     return jsonify({'message': 'Tipo created successfully'}), 201
 
-@app.route('/tipos/id/<int:id>', methods=['GET'])
-def get_tipo_by_id(id):
-    tipo = Tipo.query.get_or_404(id)
+@app.route('/tipos/id', methods=['GET'])
+def get_tipo_by_id():
+    data = request.get_json()
+    tipo = Tipo.query.get_or_404(data['id'])
     return jsonify({
         'id': tipo.id,
-        'tipo': tipo.tipo,
+        'nome': tipo.nome,
         'descricao': tipo.descricao
     }), 200
 
-@app.route('/tipos/nome/<string:nome>', methods=['GET'])
-def get_tipo_by_nome(nome):
-    tipo = Tipo.query.filter_by(tipo=nome).first()
+@app.route('/tipos/nome', methods=['GET'])
+def get_tipo_by_nome():
+    data = request.get_json()
+    tipo = Tipo.query.filter_by(nome=data['nome']).first()
     if not tipo:
         return jsonify({'error': 'Tipo not found'}), 404
     return jsonify({
         'id': tipo.id,
-        'tipo': tipo.tipo,
+        'tipo': tipo.nome,
         'descricao': tipo.descricao
     }), 200
 
-@app.route('/usuario/<int:id>/add_fichas', methods=['POST'])
-def add_fichas(id):
-    user = Usuario.query.get(id)
+@app.route('/usuario/add_fichas', methods=['POST'])
+def add_fichas():
+    data = request.get_json()
+    user = Usuario.query.get(data['id'])
     if not user:
         return jsonify({'error': 'User not found'}), 404
     
@@ -302,9 +309,10 @@ def add_fichas(id):
 
     return jsonify({'message': f'Added {fichas_to_add} fichas to user {id}', 'fichas': user.fichas}), 200
 
-@app.route('/usuario/<int:id>/deduct_fichas', methods=['POST'])
-def deduct_fichas(id):
-    user = Usuario.query.get(id)
+@app.route('/usuario/deduct_fichas', methods=['POST'])
+def deduct_fichas():
+    data = request.get_json()
+    user = Usuario.query.get(data['id'])
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
