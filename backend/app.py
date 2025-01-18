@@ -194,6 +194,7 @@ def get_usuarios():
             'nome': usuario.nome,
             'email': usuario.email,
             'cpf': usuario.cpf,
+            'senha': usuario.senha,
             'tipo_id': usuario.tipo_id,
             'is_nutricionista': usuario.is_nutricionista,
             'created_at': usuario.created_at,
@@ -211,6 +212,7 @@ def get_usuario_by_id():
         'nome': usuario.nome,
         'email': usuario.email,
         'cpf': usuario.cpf,
+        'senha': usuario.senha,
         'tipo_id': usuario.tipo_id,
         'is_nutricionista': usuario.is_nutricionista,
         'created_at': usuario.created_at,
@@ -268,32 +270,18 @@ def create_tipo():
     db.session.commit()
     return jsonify({'message': 'Tipo created successfully'}), 201
 
-@app.route('/tipos/all', methods=['GET'])
-def get_tipos():
-    tipos = Tipo.query.all()
-    result = []
-    for tipo in tipos:
-        result.append({
-            'id': tipo.id,
-            'nome': tipo.nome,
-            'descricao': tipo.descricao
-        })
-    return jsonify(result)
-
-@app.route('/tipos/id', methods=['GET'])
-def get_tipo_by_id():
-    data = request.get_json()
-    tipo = Tipo.query.get_or_404(data['id'])
+@app.route('/tipos/id/<int:id>', methods=['GET'])
+def get_tipo_by_id(id):
+    tipo = Tipo.query.get_or_404(id)
     return jsonify({
         'id': tipo.id,
         'nome': tipo.nome,
         'descricao': tipo.descricao
     }), 200
 
-@app.route('/tipos/nome', methods=['GET'])
-def get_tipo_by_nome():
-    data = request.get_json()
-    tipo = Tipo.query.filter_by(nome=data['nome']).first()
+@app.route('/tipos/nome/<string:nome>', methods=['GET'])
+def get_tipo_by_nome(nome):
+    tipo = Tipo.query.filter_by(nome=nome).first()
     if not tipo:
         return jsonify({'error': 'Tipo not found'}), 404
     return jsonify({

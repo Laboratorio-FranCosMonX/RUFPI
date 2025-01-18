@@ -2,11 +2,19 @@ import { Box, Button, Container, Divider, List, ListItem } from "@mui/material";
 import { useState } from "react";
 import MainMenu from "../components/MainMenu";
 import Cardapio from "../menu/menu";
+import CadastroCardapio from "../menu/Register";
 import { CardapioType } from "../utils/@types/Cardapio";
 import api from "../utils/api/api";
 
+interface ModalHomeParams {
+  cadastroCardapio: boolean
+}
+
 const Home = () => {
   const [cardapios, setCardapios] = useState<CardapioType[]>()
+  const [modalHome, setModalHome] = useState<ModalHomeParams>({
+    cadastroCardapio: false
+  })
 
   const handleAtualizaCardpio = () => {
     console.log(Date.now())
@@ -19,6 +27,25 @@ const Home = () => {
         setCardapios(data)
         console.log(cardapios)
       })
+  }
+
+  //callbacks
+  const callbackCloseModal = () => {
+    setModalHome({
+      ...modalHome,
+      cadastroCardapio: false
+    })
+  }
+
+  const handleModal = () => {
+    if (!modalHome.cadastroCardapio)
+      return null;
+
+    return (
+      < CadastroCardapio
+        fecharModal={callbackCloseModal}
+        atualizarDados={handleAtualizaCardpio} />
+    )
   }
 
   return (
@@ -36,6 +63,13 @@ const Home = () => {
             position: 'fixed', right: '15px', top: '60px', zIndex: '10', opacity: `10%`, ':hover': {
               opacity: `100%`
             }
+          }}
+          onClick={() => {
+            console.log("abertura do cadastro " + modalHome.cadastroCardapio)
+            setModalHome({
+              ...modalHome,
+              cadastroCardapio: true
+            })
           }}
         >Novo Cardápio</Button>
         <List
@@ -59,6 +93,7 @@ const Home = () => {
         </List>
       </Box>
       <Button onClick={() => handleAtualizaCardpio()}>Load</Button>
+      {handleModal()}
     </Container>
   );
 }

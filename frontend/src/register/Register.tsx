@@ -3,6 +3,7 @@ import { Box, Button, Card, CardContent, CardHeader, Checkbox, Container, Divide
 import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/api/api";
 import { userRegisterFormData, userRegisterSchema } from "../utils/schemas/UserRegisterSchema";
 
 const Cadastro = () => {
@@ -18,6 +19,37 @@ const Cadastro = () => {
     resolver: zodResolver(userRegisterSchema),
   })
 
+  const handleCreateTipo = async (tipo: string, descricao: string): Promise<number> => {
+    let tipoEncontrado = false
+
+    let contador_para_parar = 0;
+    let id_Tipo: number = -1;
+    while (!tipoEncontrado) {
+      id_Tipo = await api.get(`/tipos/nome/${tipo}`)
+        .then((response) => {
+          tipoEncontrado = true;
+          return response.data.id;
+        })
+        .catch(async (err) => {
+          console.log(err)
+          await api.post("/tipos/create", {
+            nome: tipo,
+            descricao: descricao
+          })
+            .then((res) => {
+              console.log("criado com sucesso" + res)
+            })
+          return -1;
+        })
+
+      contador_para_parar++;
+      if (contador_para_parar > 5) {
+        return -1
+      }
+    }
+    return id_Tipo
+  }
+
   /**
    * A ser implementado:
    * - mostrar uma mensagem ao usuário impedindo que ele use qualquer comando enquanto a aplicação
@@ -28,6 +60,35 @@ const Cadastro = () => {
   const onSubmit: SubmitHandler<userRegisterFormData> = async (data) => {
     console.log(data)
 
+    const tipo_da_conta: string = tipoConta === 1 ? "administrativo" : "comum";
+
+    await handleCreateTipo(
+      tipo_da_conta === "administrativo" ? "administrador" : "comum",
+      tipo_da_conta === "administrativo" ? "Acesso a todas as funcionalidades do sistema" :
+        "Apenas visualizar cardapios e alterar informações do perfil"
+    )
+      .then(async (tipo_id) => {
+        console.log(tipo_id)
+        await api.post("/usuarios/create", {
+          nome: data.nome,
+          email: data.email,
+          cpf: data.cpf,
+          matricula_siapi: data.id,
+          tipo_id: tipo_id,
+          is_nutricionista: data.nutricionista,
+          senha: data.senha
+        })
+          .then(() => {
+            console.log("Usuário registrado com sucesso")
+          })
+          .catch((e) => {
+            console.error("erro ao cadastrar usuario")
+            console.error(e)
+          })
+      })
+      .catch(() => {
+        console.error("Erro ao cadastrar e encontrar tipo")
+      })
   }
 
   return (
@@ -67,7 +128,7 @@ const Cadastro = () => {
                 <Divider />
                 <TextField
                   label="CPF"
-                  type="text"
+                  type="number"
                   variant="outlined"
                   {...register('cpf')}
                   error={!!errors.cpf}
@@ -97,7 +158,7 @@ const Cadastro = () => {
                 />
                 <TextField
                   label={tipoConta == 0 ? "matricula" : "Siape"}
-                  type="text"
+                  type="number"
                   variant="outlined"
                   {...register('id')}
                   error={!!errors.id}
