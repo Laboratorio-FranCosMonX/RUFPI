@@ -363,7 +363,7 @@ def get_cardapios():
             pratos = Prato.query.all()
             result_pratos = []
             for prato in pratos:
-                igredientes = Igrediente.query.all()
+                igredientes = Ingrediente.query.all()
                 result_igredientes = []
                 for igrediente in igredientes:
                     result_igredientes.append({
