@@ -10,7 +10,7 @@ interface AtualizarSenhaParams {
   fecharModal: () => void;
 }
 
-const AtualizarSenha = ({ fecharModal, password, updateAt, id }: AtualizarSenhaParams & { password: String, updateAt: Date, id: string }) => {
+const AtualizarSenha = ({ fecharModal, password, updateAt, id }: AtualizarSenhaParams & { password: String, updateAt: Date, id: number }) => {
   const [modalOpen, setModalOpen] = useState(true)
 
   const {

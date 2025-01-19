@@ -6,11 +6,18 @@ import AtualizarEmail from "./UpdateEmail";
 import AtualizarSenha from "./UpdatePassword";
 import AtualizarPerfil from "./UpdateProfile";
 
+interface Tipo {
+  id: number
+  nome: string
+  descricao: string
+}
+
 interface Usuario {
   nome: string
-  id: string
+  id: number
   email: string
-  tipo: number
+  matricula_siapi: number
+  tipo: Tipo
   nutricionista: boolean
 }
 
@@ -24,7 +31,7 @@ interface ModalInterface {
 const Perfil = () => {
 
   const [profile, setProfile] = useState<Usuario>({
-    email: '', id: '', nome: '', tipo: -1, nutricionista: false
+    email: '', id: -1, matricula_siapi: -1, nome: '', nutricionista: false, tipo: { id: -1, descricao: '', nome: '' }
   })
   const [profileInicializado, setProfileInicializado] = useState(false)
   const [dadosCarregados, setDadosCarregados] = useState(false)
@@ -40,9 +47,10 @@ const Perfil = () => {
   }, [profileInicializado])
 
   const handleProfileData = async () => {
-    await api.get(`/usuario/${api.defaults.data.user.id}`)
+    await api.get(`/usuarios/${api.defaults.data.user.id}`)
       .then((response) => {
         setProfile(response.data)
+        console.log(response.data.tipo)
         if (profile !== undefined) setDadosCarregados(true)
       })
       .catch((e) => {
@@ -116,7 +124,7 @@ const Perfil = () => {
           <Grid2 display={"flex"} justifyContent={'space-between'} width={'70%'} border={"1px solid gray"} borderRadius={'19px'}>
             <Box display="flex" flexDirection={"column"} gap={1} margin={2} width={'100%'} position={"relative"}>
               <Typography variant="h5" >{profile.nome}</Typography>
-              <Typography variant="body1" >Matricula: {profile.id}</Typography>
+              <Typography variant="body1" >{profile.tipo.nome}: {profile.matricula_siapi}</Typography>
               <Typography variant="body1" >Email: {profile.email}</Typography>
               <Typography variant="body1" >Fichas: 1</Typography>
               <Box position={'absolute'} margin={'auto'} zIndex={-1} width={'100%'} height={'100%'} display={'flex'} justifyContent={'center'} alignItems={'center'}>

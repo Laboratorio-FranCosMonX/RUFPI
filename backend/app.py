@@ -206,10 +206,10 @@ def get_usuarios():
         })
     return jsonify(result)
 
-@app.route('/usuarios/id', methods=['GET'])
-def get_usuario_by_id():
-    data = request.get_json()
-    usuario = Usuario.query.get_or_404(data['id'])
+@app.route('/usuarios/<int:id>', methods=['GET'])
+def get_usuario_by_id(id):
+    usuario = Usuario.query.get_or_404(id)
+    tipo = Tipo.query.get_or_404(usuario.tipo_id)
     return jsonify({
         'id': usuario.id,
         'matricula_siapi': usuario.matricula_siapi,
@@ -217,7 +217,11 @@ def get_usuario_by_id():
         'email': usuario.email,
         'cpf': usuario.cpf,
         'senha': usuario.senha,
-        'tipo_id': usuario.tipo_id,
+        'tipo': {
+            'id': tipo.id,
+            'nome': tipo.nome,
+            'descricao': tipo.descricao
+        },
         'is_nutricionista': usuario.is_nutricionista,
         'created_at': usuario.created_at,
         'updated_at': usuario.updated_at

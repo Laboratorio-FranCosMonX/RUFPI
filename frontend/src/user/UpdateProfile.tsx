@@ -16,7 +16,7 @@ interface AtualizarPerfilParams {
  * @param param0 
  * @returns 
  */
-const AtualizarPerfil = ({ atualizarDados, fecharModal, updateAt, eNutricionista, id }: AtualizarPerfilParams & { updateAt: Date, eNutricionista: boolean, id: string }) => {
+const AtualizarPerfil = ({ atualizarDados, fecharModal, updateAt, eNutricionista, id }: AtualizarPerfilParams & { updateAt: Date, eNutricionista: boolean, id: number }) => {
   const [modalOpen, setModalOpen] = useState(true)
 
   const {
