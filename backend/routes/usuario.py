@@ -1,24 +1,52 @@
 from flask import Blueprint, request, jsonify
 from models import Usuario, Tipo, db
+from utils import validate_cpf, validate_email
+from werkzeug.security import generate_password_hash
 
 usuario_bp = Blueprint('usuario', __name__)
 
 @usuario_bp.route('/usuarios/create', methods=['POST'])
 def create_usuario():
     data = request.get_json()
+    
+    if not isinstance(data.get('matricula_siapi'), int):
+        return jsonify({'error': 'Campo "matricula_siapi" deve ser um número inteiro'}), 400
+
+    if not data.get('nome'):
+        return jsonify({'error': 'Nome inválido'}), 400
+
+    email = data.get('email')
+    if not email or not validate_email(email):
+        return jsonify({'error': 'Email inválido'}), 400
+    existing_user = Usuario.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({'error': 'Email já cadastrado'}), 400
+
+    cpf = data.get('cpf')
+    if not cpf or not validate_cpf(cpf):
+        return jsonify({'error': 'CPF inválido'}), 400
+    existing_user_cpf = Usuario.query.filter_by(cpf=cpf).first()
+    if existing_user_cpf:
+        return jsonify({'error': 'CPF já cadastrado'}), 400
+
+    senha = data.get('senha')
+    if not senha or len(senha) < 6:
+        return jsonify({'error': 'Senha deve ter pelo menos 6 caracteres'}), 400
+
     tipo = Tipo.query.filter_by(id=data['tipo_id']).first()
     if not tipo:
-        return jsonify({'message': 'Tipo not found'}), 400
-    existing_user = Usuario.query.filter_by(cpf=data['cpf']).first()
-    if existing_user:
-        return jsonify({'error': 'CPF já cadastrado'}), 400
+        return jsonify({'message': 'Tipo inválido'}), 400
+
+    is_nutricionista = data.get('is_nutricionista', False)
+    if not isinstance(is_nutricionista, bool):
+        return jsonify({'error': 'Campo "is_nutricionista" deve ser um valor booleano'}), 400
 
     usuario = Usuario(
         matricula_siapi=data['matricula_siapi'],
         nome=data['nome'],
         email=data['email'],
         cpf=data['cpf'],
-        senha=data['senha'],
+        senha=generate_password_hash(data['senha']),
         tipo_id=tipo.id,
         is_nutricionista=data.get('is_nutricionista', False),
         fichas=0
@@ -26,41 +54,60 @@ def create_usuario():
 
     db.session.add(usuario)
     db.session.commit()
-    return jsonify({'message': 'Usuario created successfully'}), 201
+    return jsonify({'message': 'Usuario criado com sucesso'}), 201
 
 @usuario_bp.route('/usuarios/update', methods=['PUT'])
 def update_usuario():
     data = request.get_json()
     if 'id' not in data:
-        return jsonify({'error': 'ID is required'}), 400
+        return jsonify({'error': 'É necessário informar o ID do usuário a ser alterado'}), 400
     usuario = Usuario.query.get_or_404(data['id'])
 
+    if 'matricula_siapi' in data:
+        if not isinstance(data['matricula_siapi'], int):
+            return jsonify({'error': 'Campo "matricula_siapi" deve ser um número inteiro'}), 400
+        usuario.matricula_siapi = data['matricula_siapi']
+
     if 'nome' in data:
+        if not data['nome']:
+            return jsonify({'error': 'Nome inválido'}), 400
         usuario.nome = data['nome']
+
     if 'email' in data:
-        existing_user = Usuario.query.filter_by(email=data['email']).first()
-        if existing_user and existing_user.id != id:
+        email = data['email']
+        if not email or not validate_email(email):
+            return jsonify({'error': 'Email inválido'}), 400
+        existing_user = Usuario.query.filter_by(email=email).first()
+        if existing_user and existing_user.id != usuario.id:
             return jsonify({'error': 'Email já cadastrado'}), 400
-        usuario.email = data['email']
+        usuario.email = email
+
     if 'cpf' in data:
-        existing_user = Usuario.query.filter_by(cpf=data['cpf']).first()
-        if existing_user and existing_user.id != id:
+        cpf = data['cpf']
+        if not cpf or not validate_cpf(cpf):
+            return jsonify({'error': 'CPF inválido'}), 400
+        existing_user_cpf = Usuario.query.filter_by(cpf=cpf).first()
+        if existing_user_cpf and existing_user_cpf.id != usuario.id:
             return jsonify({'error': 'CPF já cadastrado'}), 400
-        usuario.cpf = data['cpf']
+        usuario.cpf = cpf
+
     if 'senha' in data:
-        usuario.senha = data['senha']
+        senha = data['senha']
+        if not senha or len(senha) < 6:
+            return jsonify({'error': 'Senha deve ter pelo menos 6 caracteres'}), 400
+        usuario.senha = generate_password_hash(senha)
+
     if 'tipo_id' in data:
         tipo = Tipo.query.filter_by(id=data['tipo_id']).first()
         if not tipo:
-            return jsonify({'message': 'Tipo not found'}), 400
-        usuario.tipo_id = tipo.id
+            return jsonify({'error': 'Tipo inválido'}), 400
+        usuario.tipo_id = data['tipo_id']
+
     if 'is_nutricionista' in data:
-        usuario.is_nutricionista = data['is_nutricionista']
-    if 'fichas' in data:
-        try:
-            usuario.fichas = int(data['fichas'])
-        except ValueError:
-            return jsonify({'error': 'Invalid fichas value'}), 400
+        is_nutricionista = data['is_nutricionista']
+        if not isinstance(is_nutricionista, bool):
+            return jsonify({'error': 'Campo "is_nutricionista" deve ser um valor booleano'}), 400
+        usuario.is_nutricionista = is_nutricionista
 
     db.session.commit()
     return jsonify({
@@ -74,7 +121,6 @@ def update_usuario():
             'senha': usuario.senha,
             'tipo_id': usuario.tipo.id,
             'is_nutricionista': usuario.is_nutricionista,
-            'fichas': usuario.fichas,
             'created_at': usuario.created_at,
             'updated_at': usuario.updated_at
         }

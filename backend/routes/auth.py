@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from models import Usuario
+from werkzeug.security import check_password_hash
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -7,7 +8,7 @@ auth_bp = Blueprint('auth', __name__)
 def login():
     data = request.get_json()
     user = Usuario.query.filter_by(email=data['email']).first()
-    if user and user.senha == data['senha']:
+    if user and check_password_hash(user.senha, data['senha']):
         session['user_id'] = user.id
         session['is_nutricionista'] = user.is_nutricionista
         return jsonify({
