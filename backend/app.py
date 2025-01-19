@@ -86,7 +86,7 @@ class Prato(db.Model):
 class Ingrediente(db.Model):
     __tablename__ = 'ingredientes'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nome = db.Column(db.String(100), nullable=False)
+    nome = db.Column(db.String(200), nullable=False)
 
 with app.app_context():
     db.create_all()
@@ -355,11 +355,27 @@ def get_cardapios():
     cardapios = Cardapio.query.all()
     result = []
     for cardapio in cardapios:
+        refeicoes = Refeicao.query.all()
+        result_refeicoes = []
+        for refeicao in refeicoes:
+            pratos = Prato.query.all()
+            result_pratos = []
+            for prato in pratos:
+                igredientes = Igrediente.query.all()
+                result_igredientes = []
+                for igrediente in igredientes:
+                    result_igredientes.append({
+                        'id': igrediente.id,
+                        'nome': igrediente.nome
+                    })
+                result_pratos.append(result_igredientes)
+            result_refeicoes.append(result_pratos)
         result.append({
             'id': cardapio.id,
             'descricao': cardapio.descricao,
             'data': cardapio.data,
             'anotacao': cardapio.anotacao,
+            'prato': result_refeicoes,
             'created_at': cardapio.created_at,
             'updated_at': cardapio.updated_at
         })
