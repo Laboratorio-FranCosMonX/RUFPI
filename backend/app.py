@@ -70,23 +70,25 @@ class Usuario(db.Model):
 class Cardapio(db.Model):
     __tablename__ = 'cardapios'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    descricao = db.Column(db.String(255), nullable=False)
     data = db.Column(db.Date, nullable=False)
-    anotacao = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Refeicao(db.Model):
+    __tablename__ = 'refeicoes'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tipo = db.Column(db.String(100), nullable=False)
+    anotacao = db.Column(db.String(255), nullable=False)
 
 class Prato(db.Model):
     __tablename__ = 'pratos'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nome = db.Column(db.String(100), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    preferencia_alimentar = db.Column(db.String(100), nullable=False)
 
 class Ingrediente(db.Model):
     __tablename__ = 'ingredientes'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nome = db.Column(db.String(200), nullable=False)
+    nome = db.Column(db.String(100), nullable=False)
 
 with app.app_context():
     db.create_all()
