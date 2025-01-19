@@ -23,6 +23,20 @@ def create_cardapio():
 
 @cardapio_bp.route('/cardapios/all', methods=['GET'])
 def get_cardapios():
+    cardapios = Cardapio.query.order_by(Cardapio.updated_at).limit(10).all()
+    result = []
+    for cardapio in cardapios:
+        result.append({
+            'id': cardapio.id,
+            'data': cardapio.data,
+            'created_at': cardapio.created_at,
+            'updated_at': cardapio.updated_at
+        })
+    return jsonify(result)
+
+""" 
+@cardapio_bp.route('/cardapios/all', methods=['GET'])
+def get_cardapios():
     cardapios = Cardapio.query.all()
     result = []
     for cardapio in cardapios:
@@ -50,4 +64,4 @@ def get_cardapios():
             'created_at': cardapio.created_at,
             'updated_at': cardapio.updated_at
         })
-    return jsonify(result)
+    return jsonify(result) """

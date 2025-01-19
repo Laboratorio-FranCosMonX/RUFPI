@@ -3,7 +3,7 @@ from models import Prato, db
 
 prato_bp = Blueprint('prato', __name__)
 
-@prato_bp.route('/pratos', methods=['POST'])
+@prato_bp.route('/pratos/create', methods=['POST'])
 def create_prato():
     data = request.get_json()
     prato = Prato(nome=data['nome'])
@@ -11,9 +11,9 @@ def create_prato():
     db.session.commit()
     return jsonify({'message': 'Prato created successfully'}), 201
 
-@prato_bp.route('/pratos', methods=['GET'])
+@prato_bp.route('/pratos/all', methods=['GET'])
 def get_pratos():
-    pratos = Prato.query.all()
+    pratos = Prato.query.order_by(Prato.nome).all()
     result = []
     for prato in pratos:
         result.append({

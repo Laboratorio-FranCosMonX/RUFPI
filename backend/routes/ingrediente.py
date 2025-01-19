@@ -3,7 +3,7 @@ from models import Ingrediente, db
 
 ingrediente_bp = Blueprint('ingrediente', __name__)
 
-@ingrediente_bp.route('/ingredientes', methods=['POST'])
+@ingrediente_bp.route('/ingredientes/create', methods=['POST'])
 def create_ingrediente():
     data = request.get_json()
     ingrediente = Ingrediente(nome=data['nome'])
@@ -11,9 +11,9 @@ def create_ingrediente():
     db.session.commit()
     return jsonify({'message': 'Ingrediente created successfully'}), 201
 
-@ingrediente_bp.route('/ingredientes', methods=['GET'])
+@ingrediente_bp.route('/ingredientes/all', methods=['GET'])
 def get_ingredientes():
-    ingredientes = Ingrediente.query.all()
+    ingredientes = Ingrediente.query.order_by(Ingrediente.nome).all()
     result = []
     for ingrediente in ingredientes:
         result.append({
