@@ -11,7 +11,7 @@ def create_prato():
         return jsonify({'error': 'Preferência alimentar inválida'}), 400
     
     if not data.get('ingredientes') or not isinstance(data['ingredientes'], list):
-        return jsonify({'error': 'Ingredientes devem ser uma lista de IDs'}), 400
+        return jsonify({'error': 'Campo "ingredientes" devem ser uma lista de IDs'}), 400
 
     ingredientes = Ingrediente.query.filter(Ingrediente.id.in_(data['ingredientes'])).all()
 
@@ -36,13 +36,12 @@ def create_prato():
 
 @prato_bp.route('/pratos/all', methods=['GET'])
 def get_pratos():
-    pratos = Prato.query.order_by(Prato.nome).all()
+    pratos = Prato.query.order_by(Prato.preferencia_alimentar).all()
     result = []
     for prato in pratos:
         result.append({
             'id': prato.id,
-            'nome': prato.nome,
-            'created_at': prato.created_at,
-            'updated_at': prato.updated_at
+            'preferencia_alimentar': prato.preferencia_alimentar,
+            'ingredientes': [{'id': ingrediente.id, 'nome': ingrediente.nome} for ingrediente in prato.ingredientes]
         })
     return jsonify(result)

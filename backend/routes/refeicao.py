@@ -1,23 +1,40 @@
 from flask import Blueprint, request, jsonify
-from models import Refeicao, db
+from models import Refeicao, Prato, db
 
 refeicao_bp = Blueprint('refeicao', __name__)
 
 @refeicao_bp.route('/refeicoes/create', methods=['POST'])
 def create_refeicao():
     data = request.get_json()
-    if not data or 'tipo' not in data or 'anotacao' not in data:
-        return jsonify({'error': 'Invalid input'}), 400
 
-    new_refeicao = Refeicao(tipo=data['tipo'], anotacao=data['anotacao'])
-    db.session.add(new_refeicao)
+    if not data.get('tipo') or not isinstance(data['tipo'], str):
+        return jsonify({'error': 'Tipo inválido'}), 400
+
+    if not data.get('anotacao') or not isinstance(data['anotacao'], str):
+        return jsonify({'error': 'Anotação inválida'}), 400
+
+    if not data.get('pratos') or not isinstance(data['pratos'], list):
+        return jsonify({'error': 'Campo "pratos" devem ser uma lista de IDs'}), 400
+
+    pratos = Prato.query.filter(Prato.id.in_(data['pratos'])).all()
+
+    if len(pratos) != len(data['pratos']):
+        return jsonify({'error': 'Alguns pratos não foram encontrados'}), 400
+
+    refeicao = Refeicao(tipo=data['tipo'], anotacao=data['anotacao'])
+    refeicao.pratos.extend(pratos)
+
+    db.session.add(refeicao)
     db.session.commit()
-    
+
     return jsonify({
-        'message': 'Refeicao created successfully',
-        'id': new_refeicao.id,
-        'tipo': new_refeicao.tipo,
-        'anotacao': new_refeicao.anotacao
+        'message': 'Refeição criada com sucesso',
+        'refeicao': {
+            'id': refeicao.id,
+            'tipo': refeicao.tipo,
+            'anotacao': refeicao.anotacao,
+            'pratos': [{'id': prato.id, 'preferencia_alimentar': prato.preferencia_alimentar} for prato in refeicao.pratos]
+        }
     }), 201
 
 @refeicao_bp.route('/refeicoes/all', methods=['GET'])
@@ -28,7 +45,8 @@ def get_refeicoes():
         result.append({
             'id': refeicao.id,
             'tipo': refeicao.tipo,
-            'anotacao': refeicao.anotacao
+            'anotacao': refeicao.anotacao,
+            'pratos': [{'id': prato.id, 'preferencia_alimentar': prato.preferencia_alimentar} for prato in refeicao.pratos]
         })
     return jsonify(result), 200
 
@@ -45,5 +63,6 @@ def get_refeicao_by_id():
     return jsonify({
         'id': refeicao.id,
         'tipo': refeicao.tipo,
-        'anotacao': refeicao.anotacao
+        'anotacao': refeicao.anotacao,
+        'pratos': [{'id': prato.id, 'preferencia_alimentar': prato.preferencia_alimentar} for prato in refeicao.pratos]
     }), 200
