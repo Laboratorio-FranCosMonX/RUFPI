@@ -6,8 +6,8 @@ export const userRegisterSchema = z
       message: "Nesse campo deve conter obrigatoriamente uma string."
     }).min(1, { message: 'O nome não pode estar vazio.' })
       .max(50, { message: 'O campo não pode ultrapassar mais que 50 caracteres.' }),
-    cpf: z.number({ message: "Campo obrigatório" }).positive(),
-    id: z.number({ message: "Campo obrigatório" }).positive(),
+    cpf: z.number({ message: "Campo obrigatório" }),
+    id: z.number({ message: "Campo obrigatório" }),
     tipo: z.number(),
     nutricionista: z.boolean(),
     email: z.string().email({ message: "O email é inválido." })
@@ -20,7 +20,7 @@ export const userRegisterSchema = z
   .required()
   .refine(data => data.senha === data.repetirSenha, {
     message: 'As senhas devem ser iguais nos campos senha e repetir senha.',
-    path: ['repeatPassword'],
+    path: ['repetirSenha'],
   })
 
 export type userRegisterFormData = z.infer<typeof userRegisterSchema>

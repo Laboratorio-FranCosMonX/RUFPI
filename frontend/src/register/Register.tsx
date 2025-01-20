@@ -1,14 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Card, CardContent, CardHeader, Checkbox, Container, Divider, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { AlertColor, Box, Button, Card, CardContent, CardHeader, Checkbox, Container, Divider, FormControlLabel, InputLabel, LinearProgress, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import AlertSnackBar from "../components/InformSystem";
 import api from "../utils/api/api";
 import { userRegisterFormData, userRegisterSchema } from "../utils/schemas/UserRegisterSchema";
 
 const Cadastro = () => {
   const navigate = useNavigate();
   const [tipoConta, setTipoConta] = useState<number>(-1);
+  const [messageSystem, setMessageSystem] = useState<{ message: string, color: AlertColor }>({
+    message: '', color: 'info'
+  })
+  const [processando, setProcessando] = useState(false)
 
   const {
     register,
@@ -58,37 +63,68 @@ const Cadastro = () => {
    * @param data 
    */
   const onSubmit: SubmitHandler<userRegisterFormData> = async (data) => {
-    console.log(data)
-
+    // console.log(data)
+    setProcessando(true)
     const tipo_da_conta: string = tipoConta === 1 ? "administrativo" : "comum";
 
     await handleCreateTipo(
       tipo_da_conta === "administrativo" ? "administrador" : "comum",
       tipo_da_conta === "administrativo" ? "Acesso a todas as funcionalidades do sistema" :
         "Apenas visualizar cardapios e alterar informações do perfil"
-    )
-      .then(async (tipo_id) => {
-        console.log(tipo_id)
-        await api.post("/usuarios/create", {
-          nome: data.nome,
-          email: data.email,
-          cpf: data.cpf,
-          matricula_siapi: data.id,
-          tipo_id: tipo_id,
-          is_nutricionista: data.nutricionista,
-          senha: data.senha
+    ).then(async (tipo_id) => {
+      // console.log(tipo_id)
+      await api.post("/usuarios/create", {
+        nome: data.nome,
+        email: data.email,
+        cpf: data.cpf,
+        matricula_siapi: data.id,
+        tipo_id: tipo_id,
+        is_nutricionista: data.nutricionista,
+        senha: data.senha
+      }).then(() => {
+        setMessageSystem({
+          color: 'success',
+          message: 'Usuário cadastrado com sucesso!'
         })
-          .then(() => {
-            console.log("Usuário registrado com sucesso")
+        setTimeout(() => {
+          setMessageSystem({
+            color: 'info',
+            message: ''
           })
-          .catch((e) => {
-            console.error("erro ao cadastrar usuario")
-            console.error(e)
+          navigate('/')
+          setProcessando(false)
+        }, 4000)
+      })
+        .catch((e) => {
+          console.error(e)
+          setMessageSystem({
+            color: 'error',
+            message: ("Sistema informa: " + e.response.data.error)
           })
+          setTimeout(() => {
+            setMessageSystem({
+              color: 'info',
+              message: ''
+            })
+            setProcessando(false)
+          }, 4000)
+        })
+    })
+      .catch((e) => {
+        // console.error(e)
+        setMessageSystem({
+          color: 'error',
+          message: ("Houve um problema ao cadastrar o usuário.\nSISTEMA INFORMA: " + e.response.data.error)
+        })
+        setTimeout(() => {
+          setMessageSystem({
+            color: 'info',
+            message: ''
+          })
+          setProcessando(false)
+        }, 2000)
       })
-      .catch(() => {
-        console.error("Erro ao cadastrar e encontrar tipo")
-      })
+
   }
 
   return (
@@ -130,10 +166,9 @@ const Cadastro = () => {
                   label="CPF"
                   type="number"
                   variant="outlined"
-                  {...register('cpf')}
+                  {...register('cpf', { valueAsNumber: true })}
                   error={!!errors.cpf}
                   helperText={errors.cpf?.message}
-                  required
                   fullWidth
                 />
                 <TextField
@@ -143,7 +178,6 @@ const Cadastro = () => {
                   {...register('nome')}
                   error={!!errors.nome}
                   helperText={errors.nome?.message}
-                  required
                   fullWidth
                 />
                 <TextField
@@ -153,17 +187,15 @@ const Cadastro = () => {
                   {...register('email')}
                   error={!!errors.email}
                   helperText={errors.email?.message}
-                  required
                   fullWidth
                 />
                 <TextField
                   label={tipoConta == 0 ? "matricula" : "Siape"}
                   type="number"
                   variant="outlined"
-                  {...register('id')}
+                  {...register('id', { valueAsNumber: true })}
                   error={!!errors.id}
                   helperText={errors.id?.message}
-                  required
                   fullWidth
                 />
                 <TextField
@@ -173,7 +205,6 @@ const Cadastro = () => {
                   {...register('senha')}
                   error={!!errors.senha}
                   helperText={errors.senha?.message}
-                  required
                   fullWidth
                 />
                 <TextField
@@ -183,7 +214,6 @@ const Cadastro = () => {
                   {...register('repetirSenha')}
                   error={!!errors.repetirSenha}
                   helperText={errors.repetirSenha?.message}
-                  required
                   fullWidth
                 />
                 <FormControlLabel
@@ -191,16 +221,30 @@ const Cadastro = () => {
                   label="Marque essa caixa se você for assumir o papel de nutricionista."
                 />
                 <Box display={'flex'} justifyContent={"space-between"}>
-                  <Button variant="contained" onClick={() => {
-                    navigate('/');
-                  }}>Cancelar</Button>
-                  <Button variant="contained" type="submit">Confirmar solicitação</Button>
+                  {processando && <LinearProgress />}
+                  {
+                    !processando &&
+                    <>
+                      <Button variant="contained" onClick={() => { navigate('/'); }}>Cancelar</Button>
+                      <Button variant="contained" type="submit">Confirmar solicitação</Button>
+                    </>
+                  }
                 </Box>
               </>
             }
           </CardContent>
         </form>
       </Card>
+      {
+        processando &&
+        <AlertSnackBar
+          message={messageSystem.message}
+          severityMessage={messageSystem.color}
+          alignHorizontal="left"
+          alignVertical="top"
+          duracao={8}
+        />
+      }
     </Container>
   )
 }
