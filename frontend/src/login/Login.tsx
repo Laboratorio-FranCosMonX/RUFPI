@@ -1,13 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Card, CardContent, CardHeader, Container, Grid2, TextField, Typography } from "@mui/material";
+import { AlertColor, Box, Button, Card, CardContent, CardHeader, Container, Grid2, TextField, Typography } from "@mui/material";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import AlertSnackBar from "../components/InformSystem";
 import api from "../utils/api/api";
 import { LoginFormData, LoginSchema } from "../utils/schemas/LoginSchema";
 
 export default function Login() {
   const navigate = useNavigate()
-
+  const [processando, setProcessando] = useState(false)
+  const [messageSystem, setMessageSystem] = useState<{ message: string, color: AlertColor, duracao: number }>({
+    message: '', color: 'info', duracao: 4
+  })
 
   const {
     register,
@@ -25,27 +30,47 @@ export default function Login() {
    * @param data 
    */
   const onSubmit: SubmitHandler<LoginFormData> = async (data) => {
+    setProcessando(true)
     await api
       .post(`/login`, {
         email: data.email,
         senha: data.senha
       })
       .then((response) => {
-        alert("Login efetuado com sucesso")
         api.defaults.data = {//salvando alguns dados
           user: {
             id: response.data.id,
             nome: response.data.nome
           }
         }
-        console.log(api.defaults.data)
+        setMessageSystem({
+          ...messageSystem,
+          message: ("Login efetuado com sucesso!"),
+          color: 'success'
+        })
         setTimeout(() => {//ir para a tela de login
+          setMessageSystem({
+            ...messageSystem,
+            message: '',
+            color: 'info'
+          })
           navigate('/home')
-        }, 1000);
+        }, 2000);
       })
-      .catch((erro) => {
-        console.log(erro)
-        console.log("falha ao registrar usuario")
+      .catch((error) => {
+        setMessageSystem({
+          ...messageSystem,
+          message: ("Houve um problema ao fazer o Login: " + error.response.data.error),
+          color: 'error'
+        })
+        setTimeout(() => {
+          setMessageSystem({
+            ...messageSystem,
+            message: '',
+            color: 'info'
+          })
+          setProcessando(false)
+        }, 4000)
       })
   }
 
@@ -96,7 +121,16 @@ export default function Login() {
           </CardContent>
         </form>
       </Card>
-
+      {
+        processando &&
+        <AlertSnackBar
+          message={messageSystem.message}
+          severityMessage={messageSystem.color}
+          alignHorizontal="center"
+          alignVertical="top"
+          duracao={messageSystem.duracao}
+        />
+      }
     </Container >
   );
 }
