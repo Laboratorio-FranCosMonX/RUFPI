@@ -36,13 +36,12 @@ def create_prato():
 
 @prato_bp.route('/pratos/all', methods=['GET'])
 def get_pratos():
-    pratos = Prato.query.order_by(Prato.nome).all()
+    pratos = Prato.query.order_by(Prato.preferencia_alimentar).all()
     result = []
     for prato in pratos:
         result.append({
             'id': prato.id,
-            'nome': prato.nome,
-            'created_at': prato.created_at,
-            'updated_at': prato.updated_at
+            'preferencia_alimentar': prato.preferencia_alimentar,
+            'ingredientes': [{'id': ingrediente.id, 'nome': ingrediente.nome} for ingrediente in prato.ingredientes]
         })
     return jsonify(result)
