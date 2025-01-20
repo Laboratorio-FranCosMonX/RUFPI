@@ -11,7 +11,7 @@ def create_prato():
         return jsonify({'error': 'Preferência alimentar inválida'}), 400
     
     if not data.get('ingredientes') or not isinstance(data['ingredientes'], list):
-        return jsonify({'error': 'Ingredientes devem ser uma lista de IDs'}), 400
+        return jsonify({'error': 'Campo "ingredientes" devem ser uma lista de IDs'}), 400
 
     ingredientes = Ingrediente.query.filter(Ingrediente.id.in_(data['ingredientes'])).all()
 
