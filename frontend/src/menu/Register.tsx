@@ -3,16 +3,40 @@ import { useState } from "react";
 import { PratoType } from "../utils/@types/Cardapio";
 import api from "../utils/api/api";
 
-interface AtualizarSenhaParams {
+interface CadastrarCardapioParams {
   atualizarDados: () => void;
   fecharModal: () => void;
+  callbackCadastroPrato: () => void;
 }
 
-const CadastroCardapio = ({ atualizarDados, fecharModal }: AtualizarSenhaParams) => {
+const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }: CadastrarCardapioParams) => {
   const [modalOpen, setModalOpen] = useState(true)
+  const [modal, setModal] = useState<{ cadastroPrato: boolean }>({
+    cadastroPrato: false
+  })
   const [pratos, setPratos] = useState<{ id: number, igredientes: string }[]>([])
+  const [refeicoes, setRefeicoes] = useState<{ tipo: string, anotacao: string, pratos: number[] }[]>([])
+  /**
+   * Verifica se já existe o objeto refeição já criado
+   * @param horario "Café da manhã" | "Almoço" | "Jantar"
+   * @returns 
+   */
+  const tem_horario_refeicao = (horario: string) => {
+    for (let refeicao of refeicoes) {
+      if (refeicao.tipo === horario) return true;
+    }
+    return false;
+  }
+
+  const add_prato_em_refeicao = async (id_prato: number) => {
+
+  }
 
   const handlePratos = () => {
+    console.log(refeicoes)
+    setModal({
+      cadastroPrato: true
+    })
     api.get('/pratos')
       .then((response) => {
         const pratosType: PratoType[] = response.data
@@ -30,6 +54,12 @@ const CadastroCardapio = ({ atualizarDados, fecharModal }: AtualizarSenhaParams)
           }]);
         }
       })
+  }
+
+  const callbackCloseModal = () => {
+    setModal({
+      cadastroPrato: false
+    })
   }
 
   const handleSubmit = () => {
@@ -68,14 +98,34 @@ const CadastroCardapio = ({ atualizarDados, fecharModal }: AtualizarSenhaParams)
                 }}
               // onChange={handleChange}
               >
-                <MenuItem value={-1}><em>None</em></MenuItem>
-                <MenuItem value={0}>Café da Manhã</MenuItem>
-                <MenuItem value={1}>Almoço</MenuItem>
-                <MenuItem value={2}>Jantar</MenuItem>
+                <MenuItem value={""}><em>None</em></MenuItem>
+                <MenuItem value={"Café da manhã"}>Café da Manhã</MenuItem>
+                <MenuItem value={"Almoço"}>Almoço</MenuItem>
+                <MenuItem value={"Jantar"}>Jantar</MenuItem>
               </ Select>
             </FormControl>
             <Divider sx={{ marginTop: '10px', marginBottom: '10px' }} />
             <form className="global-form" style={{ width: '100%' }}>
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={{ marginBottom: '10px' }}
+              >
+                <InputLabel id="tipo_refeicao_registrado_label">Tipo de refeição</InputLabel>
+                <Select
+                  labelId="tipo_refeicao_registrado_label"
+                  // value={age}
+                  label={undefined}
+                  sx={{
+                    width: '100%'
+                  }}
+                // onChange={handleChange}
+                >
+                  <MenuItem value={""}><em>None</em></MenuItem>
+                  <MenuItem value={"Normal"}>Normal</MenuItem>
+                  <MenuItem value={"Vegetariano"}>Vegetariano</MenuItem>
+                </ Select>
+              </FormControl>
               <Box sx={{
                 maxHeight: '60vh',
                 width: '100%',
@@ -119,7 +169,10 @@ const CadastroCardapio = ({ atualizarDados, fecharModal }: AtualizarSenhaParams)
               </Box>
               <Box display={'flex'} flexDirection={"column"} justifyContent={'space-between'} marginTop={'10px'} width={'100%'} gap={1}>
                 <Box display={'flex'} justifyContent={'space-between'} width={'100%'}>
-                  <Button>Novo Prato</Button>
+                  <Button onClick={() => {
+                    setModalOpen(false)
+                    callbackCadastroPrato();
+                  }}>Novo Prato</Button>
                   <Button onClick={() => {
                     handlePratos()
                   }} >Ver cardápio</Button>

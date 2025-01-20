@@ -2,18 +2,20 @@ import { Box, Button, Container, Divider, List, ListItem } from "@mui/material";
 import { useState } from "react";
 import MainMenu from "../components/MainMenu";
 import Cardapio from "../menu/menu";
+import RegistrarPrato from "../menu/plate/Register";
 import CadastroCardapio from "../menu/Register";
 import { CardapioType } from "../utils/@types/Cardapio";
 import api from "../utils/api/api";
 
 interface ModalHomeParams {
   cadastroCardapio: boolean
+  cadastrarPrato: boolean
 }
 
 const Home = () => {
   const [cardapios, setCardapios] = useState<CardapioType[]>()
   const [modalHome, setModalHome] = useState<ModalHomeParams>({
-    cadastroCardapio: false
+    cadastroCardapio: false, cadastrarPrato: false
   })
 
   const handleAtualizaCardpio = () => {
@@ -33,18 +35,35 @@ const Home = () => {
   const callbackCloseModal = () => {
     setModalHome({
       ...modalHome,
-      cadastroCardapio: false
+      cadastroCardapio: false,
+      cadastrarPrato: false
+    })
+  }
+
+  const callbackRedirecionarParaCadastroPrato = () => {
+    setModalHome({
+      ...modalHome,
+      cadastrarPrato: true
     })
   }
 
   const handleModal = () => {
-    if (!modalHome.cadastroCardapio)
+    if (!modalHome.cadastroCardapio && !modalHome.cadastrarPrato)
       return null;
+
+    if (modalHome.cadastrarPrato)
+      return (
+        <RegistrarPrato
+          fecharModal={callbackCloseModal}
+        />
+      )
 
     return (
       < CadastroCardapio
         fecharModal={callbackCloseModal}
-        atualizarDados={handleAtualizaCardpio} />
+        atualizarDados={handleAtualizaCardpio}
+        callbackCadastroPrato={callbackRedirecionarParaCadastroPrato}
+      />
     )
   }
 
