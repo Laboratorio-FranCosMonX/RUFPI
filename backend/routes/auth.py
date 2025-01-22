@@ -11,6 +11,8 @@ def login():
     if user and check_password_hash(user.senha, data['senha']):
         session['user_id'] = user.id
         session['is_nutricionista'] = user.is_nutricionista
+        session['tipo_id'] = user.tipo_id
+
         return jsonify({
             'message': 'Login successful',
             'id': user.id,

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models import Usuario, Tipo, db
 from utils import validate_cpf, validate_email
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 usuario_bp = Blueprint('usuario', __name__)
 
@@ -9,8 +9,11 @@ usuario_bp = Blueprint('usuario', __name__)
 def create_usuario():
     data = request.get_json()
     
-    if not isinstance(data.get('matricula_siapi'), int):
+    matricula_siapi = data.get('matricula_siapi')
+    if not isinstance(matricula_siapi, int):
         return jsonify({'error': 'Campo "matricula_siapi" deve ser um número inteiro'}), 400
+    if Usuario.query.filter_by(matricula_siapi=matricula_siapi).first():
+        return jsonify({'error': 'Matrícula já cadastrada'}), 400
 
     if not data.get('nome'):
         return jsonify({'error': 'Nome inválido'}), 400
@@ -55,6 +58,94 @@ def create_usuario():
     db.session.add(usuario)
     db.session.commit()
     return jsonify({'message': 'Usuario criado com sucesso'}), 201
+
+@usuario_bp.route('/usuarios/<int:id>/perfil', methods=['PATCH'])
+def update_usuario_perfil(id):
+    data = request.get_json()
+
+    usuario = Usuario.query.get_or_404(id)
+
+    if not data or ('nome' not in data and 'is_nutricionista' not in data):
+        return jsonify({'error': 'É necessário preencher ao menos um dos campos: nome ou is_nutricionista'}), 400
+
+    if 'nome' in data:
+        nome = data.get('nome')
+        if not nome or not isinstance(nome, str):
+            return jsonify({'error': 'Nome inválido'}), 400
+        usuario.nome = nome
+
+    if 'is_nutricionista' in data:
+        is_nutricionista = data.get('is_nutricionista')
+        if not isinstance(is_nutricionista, bool):
+            return jsonify({'error': 'Campo "is_nutricionista" deve ser um valor booleano'}), 400
+        usuario.is_nutricionista = is_nutricionista
+
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Perfil do usuário atualizado com sucesso',
+        'usuario': {
+            'id': usuario.id,
+            'nome': usuario.nome,
+            'is_nutricionista': usuario.is_nutricionista
+        }
+    }), 200
+
+@usuario_bp.route('/usuarios/<int:id>/password', methods=['PATCH'])
+def update_password(id):
+    data = request.get_json()
+
+    if not data or 'senha_atual' not in data or 'nova_senha' not in data:
+        return jsonify({'error': 'Campos "senha_atual" e "nova_senha" são obrigatórios'}), 400
+
+    senha_atual = data['senha_atual']
+    nova_senha = data['nova_senha']
+
+    if senha_atual == nova_senha:
+        return jsonify({'error': 'A nova senha deve ser diferente da senha atual'}), 400
+
+    usuario = Usuario.query.get(id)
+    if not usuario:
+        return jsonify({'error': 'Usuário não encontrado'}), 404
+
+    if not check_password_hash(usuario.senha, senha_atual):
+        return jsonify({'error': 'A senha atual está incorreta'}), 403
+
+    usuario.senha = generate_password_hash(nova_senha)
+    db.session.commit()
+
+    return jsonify({'message': 'Senha atualizada com sucesso'}), 200
+
+@usuario_bp.route('/usuarios/<int:id>/email', methods=['PATCH'])
+def update_email(id):
+    data = request.get_json()
+
+    if not data or 'senha_atual' not in data or 'email' not in data:
+        return jsonify({'error': 'Campos "senha_atual" e "email" são obrigatórios'}), 400
+
+    senha_atual = data['senha_atual']
+    novo_email = data['email']
+
+    if not isinstance(novo_email, str) or not validate_email(novo_email):
+        return jsonify({'error': 'Formato de email inválido'}), 400
+
+    usuario = Usuario.query.get(id)
+    if not usuario:
+        return jsonify({'error': 'Usuário não encontrado'}), 404
+
+    if not check_password_hash(usuario.senha, senha_atual):
+        return jsonify({'error': 'A senha atual está incorreta'}), 403
+
+    usuario.email = novo_email
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Email atualizado com sucesso',
+        'usuario': {
+            'id': usuario.id,
+            'email': usuario.email
+        }
+    }), 200
 
 @usuario_bp.route('/usuarios/update', methods=['PUT'])
 def update_usuario():
