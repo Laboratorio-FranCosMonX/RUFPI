@@ -14,7 +14,7 @@ def create_refeicao():
         return jsonify({'error': 'Anotação inválida'}), 400
 
     if not data.get('pratos') or not isinstance(data['pratos'], list):
-        return jsonify({'error': 'Campo "pratos" devem ser uma lista de IDs'}), 400
+        return jsonify({'error': 'Campo "pratos" deve ser uma lista de IDs'}), 400
 
     pratos = Prato.query.filter(Prato.id.in_(data['pratos'])).all()
 
@@ -33,7 +33,15 @@ def create_refeicao():
             'id': refeicao.id,
             'tipo': refeicao.tipo,
             'anotacao': refeicao.anotacao,
-            'pratos': [{'id': prato.id, 'preferencia_alimentar': prato.preferencia_alimentar} for prato in refeicao.pratos]
+            'pratos': [
+                {
+                    'id': prato.id,
+                    'preferencia_alimentar': prato.preferencia_alimentar,
+                    'ingredientes': [
+                        {'id': ingrediente.id, 'nome': ingrediente.nome} for ingrediente in prato.ingredientes
+                    ]
+                } for prato in refeicao.pratos
+            ]
         }
     }), 201
 
@@ -41,28 +49,48 @@ def create_refeicao():
 def get_refeicoes():
     refeicoes = Refeicao.query.all()
     result = []
+
     for refeicao in refeicoes:
         result.append({
             'id': refeicao.id,
             'tipo': refeicao.tipo,
             'anotacao': refeicao.anotacao,
-            'pratos': [{'id': prato.id, 'preferencia_alimentar': prato.preferencia_alimentar} for prato in refeicao.pratos]
+            'pratos': [
+                {
+                    'id': prato.id,
+                    'preferencia_alimentar': prato.preferencia_alimentar,
+                    'ingredientes': [
+                        {'id': ingrediente.id, 'nome': ingrediente.nome} for ingrediente in prato.ingredientes
+                    ]
+                } for prato in refeicao.pratos
+            ]
         })
+
     return jsonify(result), 200
+
 
 @refeicao_bp.route('/refeicoes/id', methods=['GET'])
 def get_refeicao_by_id():
     data = request.get_json()
+
     if not data or 'id' not in data:
-        return jsonify({'error': 'Invalid input'}), 400
+        return jsonify({'error': 'Entrada inválida'}), 400
 
     refeicao = Refeicao.query.get(data['id'])
     if not refeicao:
-        return jsonify({'error': 'Refeicao not found'}), 404
+        return jsonify({'error': 'Refeição não encontrada'}), 404
 
     return jsonify({
         'id': refeicao.id,
         'tipo': refeicao.tipo,
         'anotacao': refeicao.anotacao,
-        'pratos': [{'id': prato.id, 'preferencia_alimentar': prato.preferencia_alimentar} for prato in refeicao.pratos]
+        'pratos': [
+            {
+                'id': prato.id,
+                'preferencia_alimentar': prato.preferencia_alimentar,
+                'ingredientes': [
+                    {'id': ingrediente.id, 'nome': ingrediente.nome} for ingrediente in prato.ingredientes
+                ]
+            } for prato in refeicao.pratos
+        ]
     }), 200
