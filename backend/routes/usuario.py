@@ -9,8 +9,11 @@ usuario_bp = Blueprint('usuario', __name__)
 def create_usuario():
     data = request.get_json()
     
-    if not isinstance(data.get('matricula_siapi'), int):
+    matricula_siapi = data.get('matricula_siapi')
+    if not isinstance(matricula_siapi, int):
         return jsonify({'error': 'Campo "matricula_siapi" deve ser um número inteiro'}), 400
+    if Usuario.query.filter_by(matricula_siapi=matricula_siapi).first():
+        return jsonify({'error': 'Matrícula já cadastrada'}), 400
 
     if not data.get('nome'):
         return jsonify({'error': 'Nome inválido'}), 400

@@ -1,13 +1,14 @@
 from flask import Blueprint, request, jsonify, session
-from models import Cardapio, Refeicao, Prato, Ingrediente, db
+from models import Cardapio, Refeicao, Tipo, db
 from datetime import datetime
 
 cardapio_bp = Blueprint('cardapio', __name__)
 
 @cardapio_bp.route('/cardapios/create', methods=['POST'])
 def create_cardapio():
-    if not session.get('is_nutricionista'):
-        return jsonify({'message': 'Usuário não é nutricionista'}), 403
+    user_tipo = Tipo.query.get(session['tipo_id'])
+    if not user_tipo or user_tipo.nome != 'admin':
+        return jsonify({'message': 'Usuário não é administrador'}), 403
 
     data = request.get_json()
     
