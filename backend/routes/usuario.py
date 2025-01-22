@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models import Usuario, Tipo, db
 from utils import validate_cpf, validate_email
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 usuario_bp = Blueprint('usuario', __name__)
 
@@ -87,6 +87,31 @@ def update_usuario_perfil(id):
             'is_nutricionista': usuario.is_nutricionista
         }
     }), 200
+
+@usuario_bp.route('/usuario/<int:id>/password', methods=['PATCH'])
+def update_password(id):
+    data = request.get_json()
+
+    if not data or 'senha_atual' not in data or 'nova_senha' not in data:
+        return jsonify({'error': 'Campos "senha_atual" e "nova_senha" são obrigatórios'}), 400
+
+    senha_atual = data['senha_atual']
+    nova_senha = data['nova_senha']
+
+    if senha_atual == nova_senha:
+        return jsonify({'error': 'A nova senha deve ser diferente da senha atual'}), 400
+
+    usuario = Usuario.query.get(id)
+    if not usuario:
+        return jsonify({'error': 'Usuário não encontrado'}), 404
+
+    if not check_password_hash(usuario.senha, senha_atual):
+        return jsonify({'error': 'A senha atual está incorreta'}), 403
+
+    usuario.senha = generate_password_hash(nova_senha)
+    db.session.commit()
+
+    return jsonify({'message': 'Senha atualizada com sucesso'}), 200
 
 @usuario_bp.route('/usuarios/update', methods=['PUT'])
 def update_usuario():
