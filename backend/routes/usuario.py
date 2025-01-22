@@ -88,7 +88,7 @@ def update_usuario_perfil(id):
         }
     }), 200
 
-@usuario_bp.route('/usuario/<int:id>/password', methods=['PATCH'])
+@usuario_bp.route('/usuarios/<int:id>/password', methods=['PATCH'])
 def update_password(id):
     data = request.get_json()
 
@@ -112,6 +112,37 @@ def update_password(id):
     db.session.commit()
 
     return jsonify({'message': 'Senha atualizada com sucesso'}), 200
+
+@usuario_bp.route('/usuarios/<int:id>/email', methods=['PATCH'])
+def update_email(id):
+    data = request.get_json()
+
+    if not data or 'senha_atual' not in data or 'email' not in data:
+        return jsonify({'error': 'Campos "senha_atual" e "email" são obrigatórios'}), 400
+
+    senha_atual = data['senha_atual']
+    novo_email = data['email']
+
+    if not isinstance(novo_email, str) or not validate_email(novo_email):
+        return jsonify({'error': 'Formato de email inválido'}), 400
+
+    usuario = Usuario.query.get(id)
+    if not usuario:
+        return jsonify({'error': 'Usuário não encontrado'}), 404
+
+    if not check_password_hash(usuario.senha, senha_atual):
+        return jsonify({'error': 'A senha atual está incorreta'}), 403
+
+    usuario.email = novo_email
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Email atualizado com sucesso',
+        'usuario': {
+            'id': usuario.id,
+            'email': usuario.email
+        }
+    }), 200
 
 @usuario_bp.route('/usuarios/update', methods=['PUT'])
 def update_usuario():
