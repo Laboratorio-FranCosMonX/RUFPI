@@ -56,6 +56,38 @@ def create_usuario():
     db.session.commit()
     return jsonify({'message': 'Usuario criado com sucesso'}), 201
 
+@usuario_bp.route('/usuarios/<int:id>/perfil', methods=['PATCH'])
+def update_usuario_perfil(id):
+    data = request.get_json()
+
+    usuario = Usuario.query.get_or_404(id)
+
+    if not data or ('nome' not in data and 'is_nutricionista' not in data):
+        return jsonify({'error': 'É necessário preencher ao menos um dos campos: nome ou is_nutricionista'}), 400
+
+    if 'nome' in data:
+        nome = data.get('nome')
+        if not nome or not isinstance(nome, str):
+            return jsonify({'error': 'Nome inválido'}), 400
+        usuario.nome = nome
+
+    if 'is_nutricionista' in data:
+        is_nutricionista = data.get('is_nutricionista')
+        if not isinstance(is_nutricionista, bool):
+            return jsonify({'error': 'Campo "is_nutricionista" deve ser um valor booleano'}), 400
+        usuario.is_nutricionista = is_nutricionista
+
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Perfil do usuário atualizado com sucesso',
+        'usuario': {
+            'id': usuario.id,
+            'nome': usuario.nome,
+            'is_nutricionista': usuario.is_nutricionista
+        }
+    }), 200
+
 @usuario_bp.route('/usuarios/update', methods=['PUT'])
 def update_usuario():
     data = request.get_json()

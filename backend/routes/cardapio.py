@@ -4,20 +4,6 @@ from datetime import datetime
 
 cardapio_bp = Blueprint('cardapio', __name__)
 
-'''
-data = request.get_json()
-
-if 'data' not in data:
-    return jsonify({'error': 'Missing data field'}), 400
-
-cardapio = Cardapio(
-    data=datetime.strptime(data['data'], '%d-%m-%Y').date()
-)
-db.session.add(cardapio)
-db.session.commit()
-return jsonify({'message': 'Cardapio created successfully'}), 201
-'''
-
 @cardapio_bp.route('/cardapios/create', methods=['POST'])
 def create_cardapio():
     if not session.get('is_nutricionista'):
@@ -37,7 +23,6 @@ def create_cardapio():
         return jsonify({'error': 'Algumas refeições não foram encontradas'}), 400
 
     cardapio = Cardapio(data=datetime.strptime(data['data'], '%d-%m-%Y').date())
-
     cardapio.refeicoes.extend(refeicoes)
 
     db.session.add(cardapio)
@@ -47,21 +32,56 @@ def create_cardapio():
         'message': 'Cardapio criado com sucesso',
         'cardapio': {
             'id': cardapio.id,
-            'data': cardapio.data,
-            'refeicoes': [{'id': refeicao.id, 'tipo': refeicao.tipo, 'anotacao': refeicao.anotacao} for refeicao in cardapio.refeicoes]
+            'data': cardapio.data.strftime('%d-%m-%Y'),
+            'createdAt': cardapio.created_at,
+            'updatedAt': cardapio.updated_at,
+            'refeicoes': [
+                {
+                    'id': refeicao.id,
+                    'tipo': refeicao.tipo,
+                    'anotacao': refeicao.anotacao,
+                    'pratos': [
+                        {
+                            'id': prato.id,
+                            'preferencia_alimentar': prato.preferencia_alimentar,
+                            'ingredientes': [
+                                {'id': ingrediente.id, 'nome': ingrediente.nome} for ingrediente in prato.ingredientes
+                            ]
+                        } for prato in refeicao.pratos
+                    ]
+                } for refeicao in cardapio.refeicoes
+            ]
         }
     }), 201
+
 
 @cardapio_bp.route('/cardapios/all', methods=['GET'])
 def get_cardapios():
     cardapios = Cardapio.query.order_by(Cardapio.updated_at).limit(10).all()
     result = []
+
     for cardapio in cardapios:
         result.append({
             'id': cardapio.id,
-            'data': cardapio.data,
-            'refeicoes': [{'id': refeicao.id, 'tipo': refeicao.tipo, 'anotacao': refeicao.anotacao} for refeicao in cardapio.refeicoes],
-            'created_at': cardapio.created_at,
-            'updated_at': cardapio.updated_at
+            'data': cardapio.data.strftime('%d-%m-%Y'),
+            'createdAt': cardapio.created_at,
+            'updatedAt': cardapio.updated_at,
+            'refeicoes': [
+                {
+                    'id': refeicao.id,
+                    'tipo': refeicao.tipo,
+                    'anotacao': refeicao.anotacao,
+                    'pratos': [
+                        {
+                            'id': prato.id,
+                            'preferencia_alimentar': prato.preferencia_alimentar,
+                            'ingredientes': [
+                                {'id': ingrediente.id, 'nome': ingrediente.nome} for ingrediente in prato.ingredientes
+                            ]
+                        } for prato in refeicao.pratos
+                    ]
+                } for refeicao in cardapio.refeicoes
+            ]
         })
-    return jsonify(result)
+
+    return jsonify(result), 200
