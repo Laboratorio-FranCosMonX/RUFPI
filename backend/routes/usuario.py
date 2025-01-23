@@ -305,34 +305,34 @@ def add_fichas():
     data = request.get_json()
     user = Usuario.query.get(data['id'])
     if not user:
-        return jsonify({'error': 'User not found'}), 404
+        return jsonify({'error': 'Usuario não encontrado'}), 404
     
     try:
         fichas_to_add = int(request.json.get('fichas'))
     except (TypeError, ValueError):
-        return jsonify({'error': 'Invalid fichas value'}), 400
+        return jsonify({'error': 'Erro no campo "fichas"'}), 400
 
     user.fichas += fichas_to_add
     db.session.commit()
 
-    return jsonify({'message': f'Added {fichas_to_add} fichas to user {id}', 'fichas': user.fichas}), 200
+    return jsonify({'message': f'Adicionadas {fichas_to_add} fichas para usuario {id}', 'fichas': user.fichas}), 200
 
 @usuario_bp.route('/usuario/deduct_fichas', methods=['POST'])
 def deduct_fichas():
     data = request.get_json()
     user = Usuario.query.get(data['id'])
     if not user:
-        return jsonify({'error': 'User not found'}), 404
+        return jsonify({'error': 'Usuario não encontrado'}), 404
 
     try:
         fichas_to_deduct = int(request.json.get('fichas'))
     except (TypeError, ValueError):
-        return jsonify({'error': 'Invalid fichas value'}), 400
+        return jsonify({'error': 'Erro no campo "fichas'}), 400
 
     if user.fichas < fichas_to_deduct:
-        return jsonify({'error': 'Not enough fichas to deduct'}), 400
+        return jsonify({'error': 'Quantidade de fichas do usuario é menor que a quantidade a ser debitada'}), 400
 
     user.fichas -= fichas_to_deduct
     db.session.commit()
 
-    return jsonify({'message': f'Deducted {fichas_to_deduct} fichas from user {id}', 'fichas': user.fichas}), 200
+    return jsonify({'message': f'Debitadas {fichas_to_deduct} fichas do usuario {id}', 'fichas': user.fichas}), 200
