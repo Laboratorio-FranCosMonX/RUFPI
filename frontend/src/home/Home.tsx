@@ -15,6 +15,7 @@ interface ModalHomeParams {
 const Home = () => {
   const [homeInicializada, setHomeInicializada] = useState<'mensagem de null' | 'dados ok' | 'carregando'>('carregando')
   const [cardapios, setCardapios] = useState<CardapioType[]>()
+  const [usuarioAdm, setUsuarioAdm] = useState(false)
   const [modalHome, setModalHome] = useState<ModalHomeParams>({
     cadastroCardapio: false, cadastrarPrato: false
   })
@@ -22,8 +23,15 @@ const Home = () => {
   setTimeout(() => {
     if (homeInicializada === 'carregando') {
       handleAtualizaCardpio()
+      handleUsuarioEAdm()
     }
   }, 1000)
+
+  const handleUsuarioEAdm = () => [
+    api.get(`/usuarios/${api.defaults.data.user.id}`).then((response) => {
+      setUsuarioAdm(response.data.tipo.nome === "administrador")
+    })
+  ]
 
   const handleAtualizaCardpio = () => {
     console.log(Date.now())
@@ -32,7 +40,7 @@ const Home = () => {
     }
     api.get(`/cardapios/all`, dado)
       .then((dados) => {
-        console.log(dados)
+        //console.log(dados)
         const data: [CardapioType] = dados.data
         setCardapios(data)
         setHomeInicializada('dados ok')
@@ -89,21 +97,24 @@ const Home = () => {
       }} />
 
       <Box width={'100%'} display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} position={'relative'} marginTop={'50px'}>
-        <Button
-          variant="contained"
-          sx={{
-            position: 'fixed', right: '15px', top: '60px', zIndex: '10', opacity: `10%`, ':hover': {
-              opacity: `100%`
-            }
-          }}
-          onClick={() => {
-            console.log("abertura do cadastro " + modalHome.cadastroCardapio)
-            setModalHome({
-              ...modalHome,
-              cadastroCardapio: true
-            })
-          }}
-        >Novo Cardápio</Button>
+        {
+          usuarioAdm &&
+          <Button
+            variant="contained"
+            sx={{
+              position: 'fixed', right: '15px', top: '60px', zIndex: '10', opacity: `10%`, ':hover': {
+                opacity: `100%`
+              }
+            }}
+            onClick={() => {
+              console.log("abertura do cadastro " + modalHome.cadastroCardapio)
+              setModalHome({
+                ...modalHome,
+                cadastroCardapio: true
+              })
+            }}
+          >Novo Cardápio</Button>
+        }
         {
           homeInicializada === 'carregando' &&
           <Box width={"40%"} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"center"}>
