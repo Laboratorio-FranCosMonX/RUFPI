@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from models import Cardapio, Refeicao, Tipo, Usuario, db
-from datetime import datetime
+from datetime import datetime, timezone
 
 cardapio_bp = Blueprint('cardapio', __name__)
 
@@ -11,14 +11,22 @@ def create_cardapio():
     user_id = data.get('user_id')
     if not user_id or not isinstance(user_id, int):
         return jsonify({'error': 'Campo "user_id" vazio ou inválido'}), 400
-    user = Usuario.query.get_or_404(user_id)
+    user = Usuario.query.get(user_id)
+    if not user:
+        return jsonify({'message': 'Usuário não encontrado'}), 400
 
     user_tipo = Tipo.query.get(user.tipo_id)
     if not user_tipo or user_tipo.nome != 'administrador':
         return jsonify({'message': 'Usuário não é administrador'}), 403
     
     if not data.get('data') or not isinstance(data['data'], str):
-        return jsonify({'error': 'Data inválida'}), 400
+        return jsonify({'error': 'Campo "data" inválido'}), 400
+    try:
+        parsed_date = datetime.strptime(data['data'], '%d-%m-%Y')
+        parsed_date_gmt = parsed_date.replace(tzinfo=timezone.utc)
+        formatted_date = parsed_date_gmt.strftime('%a, %d %b %Y %H:%M:%S GMT')
+    except ValueError:
+        return jsonify({'error': 'Formato de data inválido. Use DD-MM-YYYY'}), 400
     
     if not data.get('refeicoes') or not isinstance(data['refeicoes'], list):
         return jsonify({'error': 'Campo "refeicoes" deve ser uma lista de IDs'}), 400
@@ -28,7 +36,7 @@ def create_cardapio():
     if len(refeicoes) != len(data['refeicoes']):
         return jsonify({'error': 'Algumas refeições não foram encontradas'}), 400
 
-    cardapio = Cardapio(data=datetime.strptime(data['data'], '%d-%m-%Y').date())
+    cardapio = Cardapio(data=formatted_date)
     cardapio.refeicoes.extend(refeicoes)
 
     db.session.add(cardapio)
@@ -38,7 +46,7 @@ def create_cardapio():
         'message': 'Cardapio criado com sucesso',
         'cardapio': {
             'id': cardapio.id,
-            'data': cardapio.data.strftime('%d-%m-%Y'),
+            'data': cardapio.data,
             'createdAt': cardapio.created_at,
             'updatedAt': cardapio.updated_at,
             'refeicoes': [

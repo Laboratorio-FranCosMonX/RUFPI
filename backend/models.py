@@ -34,7 +34,7 @@ class UsuarioCardapio(db.Model):
 class Cardapio(db.Model):
     __tablename__ = 'cardapios'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    data = db.Column(db.Date, nullable=False)
+    data = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

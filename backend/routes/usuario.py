@@ -229,6 +229,7 @@ def get_usuarios():
             'email': usuario.email,
             'cpf': usuario.cpf,
             'senha': usuario.senha,
+            'fichas': usuario.fichas,
             'tipo_id': usuario.tipo_id,
             'is_nutricionista': usuario.is_nutricionista,
             'created_at': usuario.created_at,
@@ -247,6 +248,7 @@ def get_usuario_by_id(id):
         'email': usuario.email,
         'cpf': usuario.cpf,
         'senha': usuario.senha,
+        'fichas': usuario.fichas,
         'tipo': {
             'id': tipo.id,
             'nome': tipo.nome,
