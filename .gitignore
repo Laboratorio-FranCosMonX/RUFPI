@@ -7,4 +7,6 @@ static/
 *.iml
 
 *.db
+
 backend/test.py
+backend/(OLD)app.py
