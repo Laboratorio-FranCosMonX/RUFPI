@@ -1,16 +1,21 @@
 from flask import Blueprint, request, jsonify, session
-from models import Cardapio, Refeicao, Tipo, db
+from models import Cardapio, Refeicao, Tipo, Usuario, db
 from datetime import datetime
 
 cardapio_bp = Blueprint('cardapio', __name__)
 
 @cardapio_bp.route('/cardapios/create', methods=['POST'])
 def create_cardapio():
-    user_tipo = Tipo.query.get(session['tipo_id'])
+    data = request.get_json()
+
+    user_id = data.get('user_id')
+    if not user_id or not isinstance(user_id, int):
+        return jsonify({'error': 'Campo "user_id" vazio ou inválido'}), 400
+    user = Usuario.query.get_or_404(user_id)
+
+    user_tipo = Tipo.query.get(user.tipo_id)
     if not user_tipo or user_tipo.nome != 'admin':
         return jsonify({'message': 'Usuário não é administrador'}), 403
-
-    data = request.get_json()
     
     if not data.get('data') or not isinstance(data['data'], str):
         return jsonify({'error': 'Data inválida'}), 400
