@@ -248,6 +248,7 @@ def get_usuario_by_id(id):
         'email': usuario.email,
         'cpf': usuario.cpf,
         'senha': usuario.senha,
+        'fichas': usuario.fichas,
         'tipo': {
             'id': tipo.id,
             'nome': tipo.nome,
