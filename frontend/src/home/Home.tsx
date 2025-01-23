@@ -36,7 +36,7 @@ const Home = () => {
         const data: [CardapioType] = dados.data
         setCardapios(data)
         setHomeInicializada('dados ok')
-        console.log(cardapios)
+        // console.log(cardapios)
       })
       .catch(() => {
         setHomeInicializada('mensagem de null');

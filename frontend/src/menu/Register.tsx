@@ -1,6 +1,7 @@
-import { Box, Button, Card, CardContent, CardHeader, Divider, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, Tooltip } from "@mui/material";
+import { AlertColor, Box, Button, Card, CardContent, CardHeader, Divider, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, Tooltip } from "@mui/material";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import AlertSnackBar from "../components/InformSystem";
 import { PratoType } from "../utils/@types/Cardapio";
 import api from "../utils/api/api";
 
@@ -31,6 +32,9 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
   ])
   const [error, setError] = useState<{ error_horario: boolean, error_prato: boolean, message_horario: string, message_prato: string }>({
     error_horario: false, error_prato: false, message_horario: "", message_prato: ""
+  })
+  const [messageSystem, setMessageSystem] = useState<{ visivel: boolean, message: string, color: AlertColor, duracao: number }>({
+    message: '', color: 'info', duracao: 4, visivel: false
   })
 
   useEffect(() => {
@@ -159,22 +163,63 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
 
           id_refeicoes.push(parseInt(response.data.refeicao.id))
         } catch (error) {
-          console.log(error)
+          setMessageSystem({
+            color: 'error',
+            duracao: 4,
+            message: `problema ao registrar refeições.`,
+            visivel: true
+          })
+
+          setTimeout(() => {
+            setMessageSystem({
+              ...messageSystem,
+              visivel: false
+            })
+          }, 4000)
           return;
         }
       }
     }
-    console.log(id_refeicoes)
+    // console.log(id_refeicoes)
+    // console.log(moment(new Date(Date.now()).getTime()).format("DD-MM-YYYY"))
     if (id_refeicoes.length > 0) {
       api.post("/cardapios/create", {
         data: moment(new Date(Date.now()).getTime()).format("DD-MM-YYYY"),
         refeicoes: id_refeicoes,
         user_id: parseInt(api.defaults.data.user.id)
       }).then(() => {
-        console.log("Cadastro do cardápio executado com exito")
-      }).catch((error) => {
-        console.error("Cadastro do cardápio não executado")
-        console.log(error)
+        setMessageSystem({
+          color: 'success',
+          duracao: 4,
+          message: `Cardápio criado com êxito!`,
+          visivel: true
+        })
+
+        setTimeout(() => {
+          setMessageSystem({
+            ...messageSystem,
+            visivel: false
+          })
+          atualizarDados()
+          fecharModal()
+        }, 4000)
+        // console.log("Cadastro do cardápio executado com exito")
+      }).catch((/*error*/) => {
+        setMessageSystem({
+          color: 'error',
+          duracao: 4,
+          message: `problema ao registrar Cadastro.`,
+          visivel: true
+        })
+
+        setTimeout(() => {
+          setMessageSystem({
+            ...messageSystem,
+            visivel: false
+          })
+        }, 4000)
+        // console.error("Cadastro do cardápio não executado")
+        // console.log(error)
       })
     }
   }
@@ -311,6 +356,16 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
             </Box>
           </CardContent>
         </Card>
+        {
+          messageSystem.visivel &&
+          <AlertSnackBar
+            message={messageSystem.message}
+            severityMessage={messageSystem.color}
+            alignHorizontal="center"
+            alignVertical="top"
+            duracao={messageSystem.duracao}
+          />
+        }
       </form>
     </Modal>
   )
