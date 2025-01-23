@@ -1,4 +1,4 @@
-import { Box, Button, Container, Divider, List, ListItem } from "@mui/material";
+import { Box, Button, Container, Divider, LinearProgress, List, ListItem, Typography } from "@mui/material";
 import { useState } from "react";
 import MainMenu from "../components/MainMenu";
 import Cardapio from "../menu/menu";
@@ -13,10 +13,17 @@ interface ModalHomeParams {
 }
 
 const Home = () => {
+  const [homeInicializada, setHomeInicializada] = useState<'mensagem de null' | 'dados ok' | 'carregando'>('carregando')
   const [cardapios, setCardapios] = useState<CardapioType[]>()
   const [modalHome, setModalHome] = useState<ModalHomeParams>({
     cadastroCardapio: false, cadastrarPrato: false
   })
+
+  setTimeout(() => {
+    if (homeInicializada === 'carregando') {
+      handleAtualizaCardpio()
+    }
+  }, 1000)
 
   const handleAtualizaCardpio = () => {
     console.log(Date.now())
@@ -27,7 +34,11 @@ const Home = () => {
       .then((dados) => {
         const data: [CardapioType] = dados.data
         setCardapios(data)
+        setHomeInicializada('dados ok')
         console.log(cardapios)
+      })
+      .catch(() => {
+        setHomeInicializada('mensagem de null');
       })
   }
 
@@ -75,6 +86,7 @@ const Home = () => {
         backgroundColor: 'black',
         marginBottom: '15px'
       }} />
+
       <Box width={'100%'} display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} position={'relative'} marginTop={'50px'}>
         <Button
           variant="contained"
@@ -91,27 +103,40 @@ const Home = () => {
             })
           }}
         >Novo Cardápio</Button>
-        <List
-          sx={{ width: '100%' }}
-        >
-          {cardapios !== undefined && cardapios.map((cardapio: CardapioType) => {
-            return (
-              <ListItem key={cardapio.id} sx={{
-                width: '100%',
-                display: 'flex', flexDirection: 'column', justifyContent: 'center', alignIten: 'center'
-              }}>
-                <Cardapio
-                  createAt={new Date(cardapio.createAt)}
-                  data={new Date(cardapio.data)}
-                  refeicao={cardapio.refeicao}
-                  updateAt={new Date(cardapio.updateAt)}
-                />
-              </ListItem>
-            )
-          })}
-        </List>
+        {
+          homeInicializada === 'carregando' &&
+          <Box width={"40%"} display={"flex"} flexDirection={"column"} justifyContent={"center"} alignItems={"center"}>
+            <LinearProgress sx={{ width: '100%' }} />
+            <Typography>Carregando</Typography>
+          </Box>
+        }
+        {
+          homeInicializada === 'mensagem de null' &&
+          <Typography textAlign={'center'} sx={{ width: '100%' }}>Nnehum cardápio foi registrado!!!</Typography>
+        }
+        {
+          homeInicializada === 'dados ok' &&
+          <List
+            sx={{ width: '100%' }}
+          >
+            {cardapios !== undefined && cardapios.map((cardapio: CardapioType) => {
+              return (
+                <ListItem key={cardapio.id} sx={{
+                  width: '100%',
+                  display: 'flex', flexDirection: 'column', justifyContent: 'center', alignIten: 'center'
+                }}>
+                  <Cardapio
+                    createAt={new Date(cardapio.createAt)}
+                    data={new Date(cardapio.data)}
+                    refeicao={cardapio.refeicao}
+                    updateAt={new Date(cardapio.updateAt)}
+                  />
+                </ListItem>
+              )
+            })}
+          </List>
+        }
       </Box>
-      <Button onClick={() => handleAtualizaCardpio()}>Load</Button>
       {handleModal()}
     </Container>
   );
