@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Card, CardContent, CardHeader, Divider, Grid2, Modal, TextField, Typography } from "@mui/material";
+import { AlertColor, Button, Card, CardContent, CardHeader, Divider, Grid2, Modal, TextField, Typography } from "@mui/material";
 import moment from "moment";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import AlertSnackBar from "../components/InformSystem";
 import api from "../utils/api/api";
 import { AtualizarEmailFormData, AtualizarEmailSchema } from "../utils/schemas/UpdateEmailSchema";
 
@@ -11,39 +12,56 @@ interface AtualizarSenhaParams {
   fecharModal: () => void;
 }
 
-const AtualizarEmail = ({ fecharModal, atualizarDados, password, updateAt, id }: AtualizarSenhaParams & { password: String, updateAt: Date, id: number }) => {
+const AtualizarEmail = ({ fecharModal, atualizarDados, updateAt, id }: AtualizarSenhaParams & { updateAt: Date, id: number }) => {
   const [modalOpen, setModalOpen] = useState(true)
+  const [messageSystem, setMessageSystem] = useState<{ visivel: boolean, message: string, color: AlertColor, duracao: number }>({
+    message: '', color: 'info', duracao: 4, visivel: false
+  })
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    setError
+    formState: { errors }
   } = useForm<AtualizarEmailFormData>({
     resolver: zodResolver(AtualizarEmailSchema),
   });
 
   const onSubmit: SubmitHandler<AtualizarEmailFormData> = async (data) => {
-    if (password != data.senhaAntiga) {
-      setError("senhaAntiga", {
-        message: "A senha informada não condiz com a senha atual registrada em sua conta."
-      })
-      return;
-    }
-
     const dados = {
+      senha_atual: data.senhaAntiga,
       email: data.email
     }
 
-    api.patch(`/usuario/${id}`, dados)
+    api.patch(`/usuarios/${id}/email`, dados)
       .then(() => {
-        console.log("Atualizado com sucesso")
-        atualizarDados()
-        fecharModal()
+        setMessageSystem({
+          color: 'success',
+          duracao: 4,
+          message: 'Email atualizado com êxito',
+          visivel: true
+        })
+        setTimeout(() => {
+          setMessageSystem({
+            ...messageSystem,
+            visivel: false
+          })
+          atualizarDados()
+          fecharModal()
+        }, 4000)
       })
       .catch((e) => {
-        console.log("Erro ao atualizar senha")
-        console.log(e)
+        setMessageSystem({
+          color: 'error',
+          duracao: 4,
+          message: `Houve um problema ao atualizar o email: ${e.response.data.error}.`,
+          visivel: true
+        })
+        setTimeout(() => {
+          setMessageSystem({
+            ...messageSystem,
+            visivel: false
+          })
+        }, 4000)
       })
   }
 
@@ -114,6 +132,16 @@ const AtualizarEmail = ({ fecharModal, atualizarDados, password, updateAt, id }:
             </Grid2>
           </CardContent>
         </Card>
+        {
+          messageSystem.visivel &&
+          <AlertSnackBar
+            message={messageSystem.message}
+            severityMessage={messageSystem.color}
+            alignHorizontal="center"
+            alignVertical="top"
+            duracao={messageSystem.duracao}
+          />
+        }
       </form>
     </Modal >
   );

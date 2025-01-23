@@ -50,7 +50,7 @@ const Perfil = () => {
     await api.get(`/usuarios/${api.defaults.data.user.id}`)
       .then((response) => {
         setProfile(response.data)
-        console.log(response.data.tipo)
+        //console.log(response.data.tipo)
         if (profile !== undefined) setDadosCarregados(true)
       })
       .catch((e) => {
@@ -82,7 +82,6 @@ const Perfil = () => {
           atualizarDados={callbackModalOK}
           updateAt={new Date(Date.now())}
           id={profile.id}
-          password={"teste"}
         />
       )
 
@@ -97,7 +96,7 @@ const Perfil = () => {
         />
       )
     return (
-      <AtualizarSenha fecharModal={callbackCloseModal} updateAt={new Date(Date.now())} password={"teste"} id={profile.id} />
+      <AtualizarSenha fecharModal={callbackCloseModal} updateAt={new Date(Date.now())} id={profile.id} />
     )
   }
 

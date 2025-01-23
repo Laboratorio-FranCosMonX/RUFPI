@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Card, CardContent, CardHeader, Divider, Grid2, Modal, TextField, Typography } from "@mui/material";
+import { AlertColor, Button, Card, CardContent, CardHeader, Divider, Grid2, Modal, TextField, Typography } from "@mui/material";
 import moment from "moment";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import AlertSnackBar from "../components/InformSystem";
 import api from "../utils/api/api";
 import { AtualizarSenhaFormData, AtualizarSenhaSchema } from "../utils/schemas/UpdatePasswordSchema";
 
@@ -10,37 +11,54 @@ interface AtualizarSenhaParams {
   fecharModal: () => void;
 }
 
-const AtualizarSenha = ({ fecharModal, password, updateAt, id }: AtualizarSenhaParams & { password: String, updateAt: Date, id: number }) => {
+const AtualizarSenha = ({ fecharModal, updateAt, id }: AtualizarSenhaParams & { updateAt: Date, id: number }) => {
   const [modalOpen, setModalOpen] = useState(true)
+  const [messageSystem, setMessageSystem] = useState<{ visivel: boolean, message: string, color: AlertColor, duracao: number }>({
+    message: '', color: 'info', duracao: 4, visivel: false
+  })
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    setError
+    formState: { errors }
   } = useForm<AtualizarSenhaFormData>({
     resolver: zodResolver(AtualizarSenhaSchema),
   });
 
   const onSubmit: SubmitHandler<AtualizarSenhaFormData> = async (data) => {
-    if (password != data.senhaAntiga) {
-      setError("senhaAntiga", {
-        message: "A senha informada não condiz com a senha atual registrada em sua conta."
-      })
-      return;
-    }
-
     const dados = {
-      senha: data.senha
+      senha_atual: data.senhaAntiga,
+      nova_senha: data.senha
     }
-    api.patch(`/usuario/${id}`, dados)
+    api.patch(`/usuarios/${id}/password`, dados)
       .then(() => {
-        console.log("Atualizado com sucesso")
-        fecharModal()
+        setMessageSystem({
+          color: 'success',
+          duracao: 4,
+          message: 'Senha atualizado com êxito',
+          visivel: true
+        })
+        setTimeout(() => {
+          setMessageSystem({
+            ...messageSystem,
+            visivel: false
+          })
+          fecharModal()
+        }, 4000)
       })
       .catch((e) => {
-        console.log("Erro ao atualizar senha")
-        console.log(e)
+        setMessageSystem({
+          color: 'error',
+          duracao: 4,
+          message: `Houve um problema ao atualizar a senha: ${e.response.data.error}.`,
+          visivel: true
+        })
+        setTimeout(() => {
+          setMessageSystem({
+            ...messageSystem,
+            visivel: false
+          })
+        }, 4000)
       })
   }
 
@@ -121,6 +139,16 @@ const AtualizarSenha = ({ fecharModal, password, updateAt, id }: AtualizarSenhaP
             </Grid2>
           </CardContent>
         </Card>
+        {
+          messageSystem.visivel &&
+          <AlertSnackBar
+            message={messageSystem.message}
+            severityMessage={messageSystem.color}
+            alignHorizontal="center"
+            alignVertical="top"
+            duracao={messageSystem.duracao}
+          />
+        }
       </form>
     </Modal >
   );

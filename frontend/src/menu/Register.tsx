@@ -1,5 +1,5 @@
-import { Box, Button, Card, CardContent, CardHeader, Divider, FormControl, InputLabel, MenuItem, Modal, Select, Tooltip } from "@mui/material";
-import { useState } from "react";
+import { Box, Button, Card, CardContent, CardHeader, Divider, FormControl, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, Tooltip } from "@mui/material";
+import { useEffect, useState } from "react";
 import { PratoType } from "../utils/@types/Cardapio";
 import api from "../utils/api/api";
 
@@ -9,13 +9,33 @@ interface CadastrarCardapioParams {
   callbackCadastroPrato: () => void;
 }
 
+interface PreencherCardapioParams {
+  horario: string
+  tipo_prato: string
+  prato_id: string
+}
+
 const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }: CadastrarCardapioParams) => {
   const [modalOpen, setModalOpen] = useState(true)
+  const [modalInicializado, setModalInicializado] = useState(false)
   const [modal, setModal] = useState<{ cadastroPrato: boolean }>({
     cadastroPrato: false
   })
-  const [pratos, setPratos] = useState<{ id: number, igredientes: string }[]>([])
+  const [dadosParaGravar, setDadosParaGravar] = useState<PreencherCardapioParams>({
+    horario: '', tipo_prato: '', prato_id: ""
+  })
+  const [pratos, setPratos] = useState<{ id: number, preferencia_alimentar: string, igredientes: string }[]>([])
   const [refeicoes, setRefeicoes] = useState<{ tipo: string, anotacao: string, pratos: number[] }[]>([])
+
+  useEffect(() => {
+    if (!modalInicializado) {
+      setModalInicializado(true)
+      setTimeout(() => {
+        handlePratos()
+      }, 700)
+    }
+  }, [modalInicializado])
+
   /**
    * Verifica se já existe o objeto refeição já criado
    * @param horario "Café da manhã" | "Almoço" | "Jantar"
@@ -29,7 +49,23 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
   }
 
   const add_prato_em_refeicao = async (id_prato: number) => {
+    if (dadosParaGravar.horario === "" || dadosParaGravar.tipo_prato === "") {
+      console.log("Preencha o formulário corretamente")
+    }
 
+    if (refeicoes.length === 0) {
+      setRefeicoes([...refeicoes, {
+        anotacao: "",
+        pratos: [parseInt(dadosParaGravar.prato_id)],
+        tipo: dadosParaGravar.tipo_prato
+      }])
+
+      return;
+    }
+
+    if (dadosParaGravar.horario === "Café da manhã") {
+
+    }
   }
 
   const handlePratos = () => {
@@ -37,29 +73,30 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
     setModal({
       cadastroPrato: true
     })
-    api.get('/pratos')
+    api.get('/pratos/all')
       .then((response) => {
+        if (response.data.length <= 0) return;
+
         const pratosType: PratoType[] = response.data
         let str = "";
         for (let p of pratosType) {
 
-          str = ""
-          for (let i of p.igredientes) {
-            str += i.nome + " "
+          str = "";
+          for (let i of p?.ingredientes) {
+            str += i.nome + ", "
           }
+
+          // Remove os dois últimos caracteres (", ")
+          str = str.slice(0, -2);
+          str += "."
 
           setPratos([...pratos, {
             id: p.id,
+            preferencia_alimentar: p.preferencia_alimentar,
             igredientes: str
           }]);
         }
       })
-  }
-
-  const callbackCloseModal = () => {
-    setModal({
-      cadastroPrato: false
-    })
   }
 
   const handleSubmit = () => {
@@ -81,7 +118,10 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
       }}
     >
       <form onSubmit={handleSubmit} className="global-form">
-        <Card>
+        <Card sx={{
+          width: { xs: '50%', sm: '70%', md: '80%', lg: '90%', xl: '70%' },
+          minWidth: '381px'
+        }}>
           <CardHeader title="Criar Novo cardápio" subheader="Preencha as informações do cardápio diário." />
           <CardContent>
             <FormControl
@@ -91,14 +131,18 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
               <InputLabel id="horario_cardapio_registrado_select_label">Horário</InputLabel>
               <Select
                 labelId="horario_cardapio_registrado_select_label"
-                // value={age}
-                label={undefined}
+                value={dadosParaGravar.horario}
                 sx={{
                   width: '100%'
                 }}
-              // onChange={handleChange}
+                onChange={(event: SelectChangeEvent) => {
+                  setDadosParaGravar({
+                    ...dadosParaGravar,
+                    horario: event.target.value as string
+                  });
+                }}
               >
-                <MenuItem value={""}><em>None</em></MenuItem>
+                <MenuItem value={''}><em>Nenhum</em></MenuItem>
                 <MenuItem value={"Café da manhã"}>Café da Manhã</MenuItem>
                 <MenuItem value={"Almoço"}>Almoço</MenuItem>
                 <MenuItem value={"Jantar"}>Jantar</MenuItem>
@@ -114,14 +158,19 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
                 <InputLabel id="tipo_refeicao_registrado_label">Tipo de refeição</InputLabel>
                 <Select
                   labelId="tipo_refeicao_registrado_label"
-                  // value={age}
+                  value={dadosParaGravar.tipo_prato}
                   label={undefined}
                   sx={{
                     width: '100%'
                   }}
-                // onChange={handleChange}
+                  onChange={(event: SelectChangeEvent) => {
+                    setDadosParaGravar({
+                      ...dadosParaGravar,
+                      tipo_prato: event.target.value as string
+                    });
+                  }}
                 >
-                  <MenuItem value={""}><em>None</em></MenuItem>
+                  <MenuItem value={''}><em>Nnehum</em></MenuItem>
                   <MenuItem value={"Normal"}>Normal</MenuItem>
                   <MenuItem value={"Vegetariano"}>Vegetariano</MenuItem>
                 </ Select>
@@ -140,23 +189,29 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
                   <Select
                     labelId="prato_registrado_select_label"
                     id="prato_Registrado-select"
-                    // value={age}
+                    value={dadosParaGravar.prato_id + ""}
                     label={undefined}
                     sx={{
                       width: '100%'
                     }}
-                  // onChange={handleChange}
+                    onChange={(event: SelectChangeEvent) => {
+                      setDadosParaGravar({
+                        ...dadosParaGravar,
+                        prato_id: event.target.value
+                      });
+                    }}
                   >
-                    <MenuItem value="">
+
+                    { }<MenuItem value={""}>
                       <em>Nenhum</em>
                     </MenuItem>
 
                     {pratos != undefined && pratos.map((prato) => {
                       return (
-                        <MenuItem key={prato.id} value={prato.id} sx={{
+                        <MenuItem key={prato.id} value={prato.id + ""} sx={{
                           maxWidth: '70vw', overflowX: 'auto'
                         }}>
-                          {prato.igredientes}
+                          {prato.preferencia_alimentar + ": " + prato.igredientes}
                         </MenuItem>
                       )
                     })}

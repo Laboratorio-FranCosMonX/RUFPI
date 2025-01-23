@@ -1,4 +1,4 @@
-export interface IgredienteType {
+export interface IngredienteType {
   id: number
   nome: string
 }
@@ -6,7 +6,7 @@ export interface IgredienteType {
 export interface PratoType {
   id: number
   preferencia_alimentar: 'geral' | 'vegetariano'
-  igredientes: [IgredienteType]
+  ingredientes: [IngredienteType]
 }
 
 export interface RefeicaoType {
