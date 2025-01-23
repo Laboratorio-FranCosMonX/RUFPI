@@ -11,7 +11,9 @@ def create_cardapio():
     user_id = data.get('user_id')
     if not user_id or not isinstance(user_id, int):
         return jsonify({'error': 'Campo "user_id" vazio ou inválido'}), 400
-    user = Usuario.query.get_or_404(user_id)
+    user = Usuario.query.get(user_id)
+    if not user:
+        return jsonify({'message': 'Usuário não encontrado'}), 400
 
     user_tipo = Tipo.query.get(user.tipo_id)
     if not user_tipo or user_tipo.nome != 'admin':
