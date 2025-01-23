@@ -19,6 +19,7 @@ interface Usuario {
   matricula_siapi: number
   tipo: Tipo
   nutricionista: boolean
+  fichas: number
 }
 
 interface ModalInterface {
@@ -31,7 +32,7 @@ interface ModalInterface {
 const Perfil = () => {
 
   const [profile, setProfile] = useState<Usuario>({
-    email: '', id: -1, matricula_siapi: -1, nome: '', nutricionista: false, tipo: { id: -1, descricao: '', nome: '' }
+    email: '', id: -1, matricula_siapi: -1, nome: '', nutricionista: false, tipo: { id: -1, descricao: '', nome: '' }, fichas: 0
   })
   const [profileInicializado, setProfileInicializado] = useState(false)
   const [dadosCarregados, setDadosCarregados] = useState(false)
@@ -125,7 +126,7 @@ const Perfil = () => {
               <Typography variant="h5" >{profile.nome}</Typography>
               <Typography variant="body1" >{profile.tipo.nome}: {profile.matricula_siapi}</Typography>
               <Typography variant="body1" >Email: {profile.email}</Typography>
-              <Typography variant="body1" >Fichas: 1</Typography>
+              <Typography variant="body1" >Fichas: {profile.fichas}</Typography>
               <Box position={'absolute'} margin={'auto'} zIndex={-1} width={'100%'} height={'100%'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
                 <img className="image-paper-profile" src="papelDeParedePerfilUsuario.jpg" alt="" />
               </Box>
