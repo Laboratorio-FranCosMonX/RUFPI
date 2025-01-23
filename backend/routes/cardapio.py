@@ -1,6 +1,7 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 from models import Cardapio, Refeicao, Tipo, Usuario, db
 from datetime import datetime, timezone
+from sqlalchemy import desc
 
 cardapio_bp = Blueprint('cardapio', __name__)
 
@@ -68,10 +69,9 @@ def create_cardapio():
         }
     }), 201
 
-
 @cardapio_bp.route('/cardapios/all', methods=['GET'])
 def get_cardapios():
-    cardapios = Cardapio.query.order_by(Cardapio.updated_at).limit(10).all()
+    cardapios = Cardapio.query.order_by(desc(Cardapio.updated_at)).limit(10).all()
     result = []
 
     for cardapio in cardapios:
