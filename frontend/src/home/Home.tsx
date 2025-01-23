@@ -30,8 +30,9 @@ const Home = () => {
     const dado = {
       data: new Date(Date.now())
     }
-    api.get(`/cardapio/`, dado)
+    api.get(`/cardapios/all`, dado)
       .then((dados) => {
+        console.log(dados)
         const data: [CardapioType] = dados.data
         setCardapios(data)
         setHomeInicializada('dados ok')
@@ -126,10 +127,10 @@ const Home = () => {
                   display: 'flex', flexDirection: 'column', justifyContent: 'center', alignIten: 'center'
                 }}>
                   <Cardapio
-                    createAt={new Date(cardapio.createAt)}
+                    createdAt={new Date(cardapio.createdAt)}
                     data={new Date(cardapio.data)}
-                    refeicao={cardapio.refeicao}
-                    updateAt={new Date(cardapio.updateAt)}
+                    refeicoes={cardapio.refeicoes}
+                    updatedAt={new Date(cardapio.updatedAt)}
                   />
                 </ListItem>
               )

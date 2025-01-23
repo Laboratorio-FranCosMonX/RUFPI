@@ -25,7 +25,11 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
     horario: '', tipo_prato: '', prato_id: ""
   })
   const [pratos, setPratos] = useState<{ id: number, preferencia_alimentar: string, igredientes: string }[]>([])
-  const [refeicoes, setRefeicoes] = useState<{ tipo: string, anotacao: string, pratos: number[] }[]>([])
+  const [refeicoes, setRefeicoes] = useState<{ tipo: string, anotacao: string, pratos: number[], tem_dados: boolean }[]>([
+    { tem_dados: false, anotacao: "", pratos: [], tipo: "Café da manhã" },
+    { tem_dados: false, anotacao: "", pratos: [], tipo: "Almoço" },
+    { tem_dados: false, anotacao: "", pratos: [], tipo: "Jantar" }
+  ])
 
   useEffect(() => {
     if (!modalInicializado) {
@@ -54,11 +58,11 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
     }
 
     if (refeicoes.length === 0) {
-      setRefeicoes([...refeicoes, {
-        anotacao: "",
-        pratos: [parseInt(dadosParaGravar.prato_id)],
-        tipo: dadosParaGravar.tipo_prato
-      }])
+      // setRefeicoes([...refeicoes, {
+      //   anotacao: "",
+      //   pratos: [parseInt(dadosParaGravar.prato_id)],
+      //   tipo: dadosParaGravar.tipo_prato
+      // }])
 
       return;
     }

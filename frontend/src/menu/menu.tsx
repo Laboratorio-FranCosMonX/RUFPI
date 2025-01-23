@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, Divider, List, ListItem, ListItemText, Typography } from "@mui/material";
 import moment from "moment";
-import { CardapioType, IgredienteType, PratoType, RefeicaoType } from "../utils/@types/Cardapio";
+import { CardapioType, IngredienteType, PratoType, RefeicaoType } from "../utils/@types/Cardapio";
 
-const Cardapio = ({ data, updateAt, refeicao }: CardapioType) => {
+const Cardapio = ({ data, updatedAt, refeicoes }: CardapioType) => {
 
   return (
     <Card
@@ -12,12 +12,12 @@ const Cardapio = ({ data, updateAt, refeicao }: CardapioType) => {
       }}
     >
       <CardHeader title={`Cardapio do dia ${moment(data.getTime()).format("DD/MM/YYYY")}`}
-        subheader={`Atualizado em ${moment(updateAt.getTime()).format("DD/MM/YYYY")}`} sx={{
+        subheader={`Atualizado em ${moment(updatedAt.getTime()).format("DD/MM/YYYY")}`} sx={{
           textAlign: "left", padding: '0px'
         }} />
       <CardContent sx={{ padding: '0px' }}>
         <List>
-          {refeicao !== undefined && refeicao.map((refei: RefeicaoType) => {
+          {refeicoes !== undefined && refeicoes.map((refei: RefeicaoType) => {
             return (
               <ListItem key={`refeicao-${data.getTime()}${refei.id}`} sx={{
                 display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'
@@ -45,11 +45,11 @@ const Cardapio = ({ data, updateAt, refeicao }: CardapioType) => {
                             padding: '0px', margin: '0px', marginTop: '10px', width: '100%', borderLeft: '.5px solid gray',
                             backgroundColor: '#EDEDED', borderRadius: '10%'
                           }}>
-                            {prato.igredientes.map((igrediente: IgredienteType) => {
+                            {prato.ingredientes.map((ingrediente: IngredienteType) => {
                               return (
-                                <ListItem key={`igrediente-${data.getTime()}${igrediente.id}`} sx={{ margin: '0px', padding: '0px' }}>
+                                <ListItem key={`igrediente-${data.getTime()}${ingrediente.id}`} sx={{ margin: '0px', padding: '0px' }}>
                                   <ListItemText>
-                                    <Typography width={"100%"} variant="body1" color="black" textAlign={"center"}>{`${igrediente.nome}`}</Typography>
+                                    <Typography width={"100%"} variant="body1" color="black" textAlign={"center"}>{`${ingrediente.nome}`}</Typography>
                                   </ListItemText>
                                 </ListItem>
                               )
@@ -62,11 +62,11 @@ const Cardapio = ({ data, updateAt, refeicao }: CardapioType) => {
                             padding: '0px', margin: '0px', marginTop: '10px', width: '100%', borderLeft: '.5px solid gray',
                             backgroundColor: '#BCFFB0', borderRadius: '16%'
                           }}>
-                            {prato.igredientes.map((igrediente: IgredienteType) => {
+                            {prato.ingredientes.map((ingrediente: IngredienteType) => {
                               return (
-                                <ListItem key={`igredienteVeg-${data.getTime()}${igrediente.id}`} sx={{ margin: '0px', padding: '0px' }}>
+                                <ListItem key={`igredienteVeg-${data.getTime()}${ingrediente.id}`} sx={{ margin: '0px', padding: '0px' }}>
                                   <ListItemText>
-                                    <Typography width={"100%"} variant="body1" color="black" textAlign={"center"}>{`${igrediente.nome}`}</Typography>
+                                    <Typography width={"100%"} variant="body1" color="black" textAlign={"center"}>{`${ingrediente.nome}`}</Typography>
                                   </ListItemText>
                                 </ListItem>
                               )

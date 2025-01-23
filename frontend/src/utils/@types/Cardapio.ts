@@ -5,13 +5,13 @@ export interface IngredienteType {
 
 export interface PratoType {
   id: number
-  preferencia_alimentar: 'geral' | 'vegetariano'
+  preferencia_alimentar: "geral" | "vegetariano"
   ingredientes: [IngredienteType]
 }
 
 export interface RefeicaoType {
   id: number
-  tipo: 'almoço' | 'jantar' | 'café da manhã',
+  tipo: "almoço" | "jantar" | "Café da manhã"
   anotacao: string
   pratos: [PratoType]
 }
@@ -19,7 +19,7 @@ export interface RefeicaoType {
 export interface CardapioType {
   id?: number
   data: Date
-  createAt: Date
-  updateAt: Date
-  refeicao: RefeicaoType[]
+  createdAt: Date
+  updatedAt: Date
+  refeicoes: RefeicaoType[]
 }
