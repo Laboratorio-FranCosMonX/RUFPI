@@ -77,7 +77,7 @@ def get_cardapios():
     for cardapio in cardapios:
         result.append({
             'id': cardapio.id,
-            'data': cardapio.data.strftime('%d-%m-%Y'),
+            'data': cardapio.data,
             'createdAt': cardapio.created_at,
             'updatedAt': cardapio.updated_at,
             'refeicoes': [
