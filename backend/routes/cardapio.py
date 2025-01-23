@@ -14,7 +14,7 @@ def create_cardapio():
     user = Usuario.query.get_or_404(user_id)
 
     user_tipo = Tipo.query.get(user.tipo_id)
-    if not user_tipo or user_tipo.nome != 'admin':
+    if not user_tipo or user_tipo.nome != 'administrador':
         return jsonify({'message': 'Usuário não é administrador'}), 403
     
     if not data.get('data') or not isinstance(data['data'], str):

@@ -6,11 +6,12 @@ refeicao_bp = Blueprint('refeicao', __name__)
 @refeicao_bp.route('/refeicoes/create', methods=['POST'])
 def create_refeicao():
     data = request.get_json()
+    print(data)
 
     if not data.get('tipo') or not isinstance(data['tipo'], str):
         return jsonify({'error': 'Tipo inválido'}), 400
 
-    if not data.get('anotacao') or not isinstance(data['anotacao'], str):
+    if not isinstance(data['anotacao'], str):
         return jsonify({'error': 'Anotação inválida'}), 400
 
     if not data.get('pratos') or not isinstance(data['pratos'], list):
