@@ -12,6 +12,7 @@ Esta é uma API em Flask simples que fornece endpoints para gerenciar os dados d
 - Werkzeug
 
 ### Setup
+- (Assumindo que esteja na pasta raiz: RUFPI)
 1. Crie o ambiente virtual:
    ```bash
    python -m venv venv
@@ -30,4 +31,15 @@ Esta é uma API em Flask simples que fornece endpoints para gerenciar os dados d
 4. Inicie o servidor:
    ```bash
    python .\backend\app.py
+   ```
+
+### Quando terminar
+1. Desative o servidor:
+   ```bash
+   CTRL+C
+   ```
+
+2. Desative o ambiente virtual:
+   ```bash
+   deactivate
    ```
