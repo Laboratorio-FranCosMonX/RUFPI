@@ -21,4 +21,9 @@ Primeiro é necessário que seja feito a instalaçao das dependências utilizand
 A aplicação, neste primeiro momento, é usada para:
 - Comprovar que o discente está com cadastro válido sem precisar entrar no SIGAA;
 - Gerenciar carteira digital de fichas do RU da universidade;
-- Visualizar o cardápio do dia, podendo ter comentários de nutricionistas;
+- Visualizar o cardápio do dia.
+- Cadastrar Cardápios cujos ingredientes já são cadastrados no sistema (backend).
+
+#### Permissões no sistema.
+
+A aplicação contém 3 tipos de permissões: usuário administrativo, usuário comum e usuário com permissões de nutricionista. Este último, ainda não foi implementado neste primeiro momento.

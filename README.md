@@ -18,3 +18,11 @@ A aplicação, neste primeiro momento, é usada para:
 - Gerenciar carteira digital de fichas do RU da universidade;
 - Visualizar o cardápio do dia, podendo ter comentários de nutricionistas;
 - Gerenciar a entrada dos alunos no restaurante universitário (RU).
+
+## Contribuidores
+
+Os principais programadores do sistema são:
+
+- Francisco Cosme
+- João Gabriel
+- Marcelo do Val
