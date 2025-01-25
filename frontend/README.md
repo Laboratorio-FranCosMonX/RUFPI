@@ -27,3 +27,46 @@ A aplicação, neste primeiro momento, é usada para:
 #### Permissões no sistema.
 
 A aplicação contém 3 tipos de permissões: usuário administrativo, usuário comum e usuário com permissões de nutricionista. Este último, ainda não foi implementado neste primeiro momento.
+
+#### Principais Telas
+
+Dentre as principais telas estão:
+
+1. Cadastro de usuário;
+2. Login de usuário;
+3. Inicio: onde terá os todos os cardápios;
+4. Perfil de usuário: para o usuário poder gerenciar suas informações;
+5. Criação de cardápios.
+
+A criação de usuário é simples. Como tem dois tipos de usuários (administrativo e comum), o usuário terá de escolher qual tipo de usuário criar para depois poder preencher os campos. Dentre os principais campos, o email e senha serão necessários para entrar na aplicação.
+
+
+<div align="center">
+<img src="../src/imagens/loginFrontend.png"> </img>
+<p>Iniciar sessão na plataforma RUFPI.</p>
+</div>
+
+A tela inicial do usuário mostrará todos os cardápios cadastrados no sistema (na versão atual da aplicação) ordenados do mais recente ao mais antigo. Caso o usuário seja um administrador, irá aparecer o botão de cadastrar cardápio no canto superior direito da tela.
+
+<div align="center">
+<img src="../src/imagens/homeFrontend.png"> </img>
+<p>Página inicial do usuário.</p>
+</div>
+
+Além disso, o usuário pode usar o menu de usuário para sair da aplicação ou entrar no perfil de usuário.
+
+No perfil de usuário, o usuário pode gerenciar algumas informações como nome, email, se ainda é nutricionista, senha e "compra" de fichas.
+
+<div align="center">
+<img src="../src/imagens/perfilFrontend.png"> </img>
+<p>Criação de um novo cardápio</p>
+</div>
+
+Na página inicial, ao selecionar a funcionalidade de criar cardápio, irá aparecer uma janela para que o usuário preencha os campos para o cadastro de um cardápio de forma simples.
+
+<div align="center">
+<img src="../src/imagens/criarCardapio.png"> </img>
+<p>Criação de um novo cardápio</p>
+</div>
+
+> A aplicação é responsiva para dispositivos de até 450px de largura.
