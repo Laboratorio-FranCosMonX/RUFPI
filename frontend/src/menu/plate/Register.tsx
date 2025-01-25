@@ -1,5 +1,6 @@
-import { Box, Button, Card, CardContent, CardHeader, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, Tooltip } from "@mui/material";
+import { AlertColor, Box, Button, Card, CardContent, CardHeader, FormControl, FormHelperText, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, Tooltip } from "@mui/material";
 import { useState } from "react";
+import AlertSnackBar from "../../components/InformSystem";
 import { IngredienteType } from "../../utils/@types/Cardapio";
 import api from "../../utils/api/api";
 
@@ -19,6 +20,9 @@ const RegistrarPrato = ({ fecharModal }: CadastrarPratoParams) => {
   const [erroPreferencia, setErroPreferencia] = useState<{ message: string, error: boolean }>({
     message: 'Escolha uma opção', error: false
   })
+  const [messageSystem, setMessageSystem] = useState<{ visivel: boolean, message: string, color: AlertColor, duracao: number }>({
+    message: '', color: 'info', duracao: 4, visivel: false
+  })
 
   setTimeout(() => {
     if (!modalInicializado) {
@@ -30,10 +34,22 @@ const RegistrarPrato = ({ fecharModal }: CadastrarPratoParams) => {
   const handleIngredientes = () => {
     api.get('/ingredientes/all')
       .then((response) => {
-        console.log(response)
         setIngredientes(response.data)
-      }).catch((error) => {
-        console.error(error)
+      }).catch(() => {
+        setMessageSystem({
+          ...messageSystem,
+          color: 'error',
+          duracao: 4,
+          message: `Erro ao carregar ingredientes.`,
+          visivel: true
+        })
+
+        setTimeout(() => {
+          setMessageSystem({
+            ...messageSystem,
+            visivel: false
+          })
+        }, 4000)
       })
   }
 
@@ -43,15 +59,59 @@ const RegistrarPrato = ({ fecharModal }: CadastrarPratoParams) => {
     setDadosASeremEnviados({
       ingredientes: v
     })
-    console.log("adicionado")
+
+    setMessageSystem({
+      ...messageSystem,
+      color: 'success',
+      duracao: 2,
+      message: `Ingrediente adicionado.`,
+      visivel: true
+    })
+
+    setTimeout(() => {
+      setMessageSystem({
+        ...messageSystem,
+        visivel: false
+      })
+    }, 2000)
   }
 
   const handleSubmit = () => {
     api.post("/pratos/create", {
       preferencia_alimentar: preferenciaAlimentar,
       ingredientes: dadosASeremEnviados.ingredientes
-    }).then(() => alert("Prato Criado com exito!"))
-      .catch(() => alert("Houve um problema ao criar o prato."))
+    }).then(() => {
+      setMessageSystem({
+        ...messageSystem,
+        color: 'success',
+        duracao: 4,
+        message: `Prato cadastrado com êxito.`,
+        visivel: true
+      })
+
+      setTimeout(() => {
+        setMessageSystem({
+          ...messageSystem,
+          visivel: false
+        })
+      }, 4000)
+    })
+      .catch(() => {
+        setMessageSystem({
+          ...messageSystem,
+          color: 'error',
+          duracao: 4,
+          message: `Houve um problema ao cadastrar o prato.`,
+          visivel: true
+        })
+
+        setTimeout(() => {
+          setMessageSystem({
+            ...messageSystem,
+            visivel: false
+          })
+        }, 4000)
+      })
   }
 
   return (
@@ -74,7 +134,7 @@ const RegistrarPrato = ({ fecharModal }: CadastrarPratoParams) => {
           minWidth: '381px'
         }}>
           <CardHeader title="Criar Novo Prato" subheader="Preencha as informações do novo prato." />
-          <CardContent>
+          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <FormControl
               fullWidth
               error={erroPreferencia.error}
@@ -138,9 +198,19 @@ const RegistrarPrato = ({ fecharModal }: CadastrarPratoParams) => {
                   }}>+</Button>
               </Tooltip>
             </ Box>
-            <Button variant="contained" onClick={() => handleSubmit()}>Finalizar</Button>
+            <Button variant="contained" onClick={() => handleSubmit()} sx={{ width: '100%' }}>Finalizar</Button>
           </CardContent>
         </Card>
+        {
+          messageSystem.visivel &&
+          <AlertSnackBar
+            message={messageSystem.message}
+            severityMessage={messageSystem.color}
+            alignHorizontal="center"
+            alignVertical="top"
+            duracao={messageSystem.duracao}
+          />
+        }
       </form>
     </Modal>
   )
