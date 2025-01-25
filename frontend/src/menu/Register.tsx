@@ -72,8 +72,8 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
     }
 
     if (error.error_horario || error.error_prato) return;
-    console.log("user id:" + api.defaults.data.user.id)
-    console.log("addicionando")
+    // console.log("user id:" + api.defaults.data.user.id)
+    // console.log("addicionando")
     const pratoIndex = procuraPrato(parseInt(dadosParaGravar.prato_id))
 
     let adicionado = false
@@ -112,7 +112,7 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
       })
       setRefeicoes(refeicoes)
     }
-    console.log(refeicoes)
+    // console.log(refeicoes)
   }
 
   const handlePratos = () => {
@@ -341,6 +341,7 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
               <Box display={'flex'} flexDirection={"column"} justifyContent={'space-between'} marginTop={'10px'} width={'100%'} gap={1}>
                 <Box display={'flex'} justifyContent={'space-between'} width={'100%'}>
                   <Button onClick={() => {
+                    fecharModal()
                     setModalOpen(false)
                     callbackCadastroPrato();
                   }}>Novo Prato</Button>
@@ -349,7 +350,7 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
                   }} >Ver cardápio</Button>
                 </Box>
                 <Button variant="contained" onClick={() => {
-                  console.log(refeicoes)
+                  // console.log(refeicoes)
                   handleSubmit()
                 }}>Finalizar</Button>
               </Box>

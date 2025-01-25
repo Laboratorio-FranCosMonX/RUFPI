@@ -1,6 +1,7 @@
 import { Box, Button, Container, Divider, LinearProgress, List, ListItem, Typography } from "@mui/material";
 import { useState } from "react";
 import MainMenu from "../components/MainMenu";
+import RegistrarIngrediente from "../menu/ingredient/Register";
 import Cardapio from "../menu/menu";
 import RegistrarPrato from "../menu/plate/Register";
 import CadastroCardapio from "../menu/Register";
@@ -10,6 +11,7 @@ import api from "../utils/api/api";
 interface ModalHomeParams {
   cadastroCardapio: boolean
   cadastrarPrato: boolean
+  cadastrarIngrediente: boolean
 }
 
 const Home = () => {
@@ -17,7 +19,7 @@ const Home = () => {
   const [cardapios, setCardapios] = useState<CardapioType[]>()
   const [usuarioAdm, setUsuarioAdm] = useState(false)
   const [modalHome, setModalHome] = useState<ModalHomeParams>({
-    cadastroCardapio: false, cadastrarPrato: false
+    cadastroCardapio: false, cadastrarPrato: false, cadastrarIngrediente: false
   })
 
   setTimeout(() => {
@@ -34,7 +36,7 @@ const Home = () => {
   ]
 
   const handleAtualizaCardpio = () => {
-    console.log(Date.now())
+    // console.log(Date.now())
     const dado = {
       data: new Date(Date.now())
     }
@@ -54,16 +56,25 @@ const Home = () => {
   //callbacks
   const callbackCloseModal = () => {
     setModalHome({
-      ...modalHome,
       cadastroCardapio: false,
-      cadastrarPrato: false
+      cadastrarPrato: false,
+      cadastrarIngrediente: false
     })
   }
 
   const callbackRedirecionarParaCadastroPrato = () => {
+    callbackCloseModal()
     setModalHome({
       ...modalHome,
       cadastrarPrato: true
+    })
+  }
+
+  const callbackRedirecionarParaCadastroIngrediente = () => {
+    callbackCloseModal()
+    setModalHome({
+      ...modalHome,
+      cadastrarIngrediente: true
     })
   }
 
@@ -74,6 +85,15 @@ const Home = () => {
     if (modalHome.cadastrarPrato)
       return (
         <RegistrarPrato
+          fecharModal={callbackCloseModal}
+          callbackCadastrarIngrediente={callbackRedirecionarParaCadastroIngrediente}
+        />
+      )
+
+    console.log(modalHome)
+    if (modalHome.cadastrarIngrediente)
+      return (
+        <RegistrarIngrediente
           fecharModal={callbackCloseModal}
         />
       )

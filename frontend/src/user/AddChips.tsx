@@ -18,6 +18,23 @@ const AdicionarFichas = ({ fecharModal, atualizarDados, id }: AtualizarSenhaPara
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    if (qtdFichas === 0) {
+      setMessageSystem({
+        message: "Coloque um valor válido a ser comprado.",
+        color: 'error',
+        duracao: 4,
+        visivel: true
+      })
+
+      setTimeout(() => {
+        setMessageSystem({
+          ...messageSystem,
+          visivel: true
+        })
+      }, 4000)
+      return;
+    }
+
     api.post("/usuario/add_fichas", { "id": id, "fichas": qtdFichas })
       .then(() => {
         setMessageSystem({
@@ -49,8 +66,6 @@ const AdicionarFichas = ({ fecharModal, atualizarDados, id }: AtualizarSenhaPara
             ...messageSystem,
             visivel: true
           })
-          atualizarDados()
-          fecharModal()
         }, 4000)
       })
   }

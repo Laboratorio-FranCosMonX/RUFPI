@@ -6,9 +6,10 @@ import api from "../../utils/api/api";
 
 interface CadastrarPratoParams {
   fecharModal: () => void;
+  callbackCadastrarIngrediente: () => void;
 }
 
-const RegistrarPrato = ({ fecharModal }: CadastrarPratoParams) => {
+const RegistrarPrato = ({ fecharModal, callbackCadastrarIngrediente }: CadastrarPratoParams) => {
   const [modalPratoOpen, setModalPratoOpen] = useState(true)
   const [modalInicializado, setModalInicializado] = useState(false)
   const [preferenciaAlimentar, setPreferenciaAlimentar] = useState<"" | "geral" | "vegetariano">('')
@@ -198,6 +199,24 @@ const RegistrarPrato = ({ fecharModal }: CadastrarPratoParams) => {
                   }}>+</Button>
               </Tooltip>
             </ Box>
+            <Button variant="outlined" onClick={() => {
+              setMessageSystem({
+                message: "Em desenvolvimento",
+                duracao: 4,
+                color: 'info',
+                visivel: true
+              })
+
+              setTimeout(() => {
+                setMessageSystem({
+                  ...messageSystem,
+                  visivel: false
+                })
+              }, 4000)
+              // setModalPratoOpen(false)
+              // fecharModal()
+              // callbackCadastrarIngrediente()
+            }} sx={{ width: '100%' }}>Novo Ingrediente</Button>
             <Button variant="contained" onClick={() => handleSubmit()} sx={{ width: '100%' }}>Finalizar</Button>
           </CardContent>
         </Card>
