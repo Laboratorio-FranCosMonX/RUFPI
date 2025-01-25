@@ -12,7 +12,7 @@ Esta é uma API em Flask simples que fornece endpoints para gerenciar os dados d
 - Werkzeug
 
 ### Setup
-- (Assumindo que esteja na pasta raiz: RUFPI)
+- Estando na pasta \backend:
 1. Crie o ambiente virtual:
    ```bash
    python -m venv venv
@@ -25,12 +25,12 @@ Esta é uma API em Flask simples que fornece endpoints para gerenciar os dados d
 
 3. Instale as dependências:
    ```bash
-   pip install -r .\backend\requirements.txt
+   pip install -r requirements.txt
    ```
 
 4. Inicie o servidor:
    ```bash
-   python .\backend\app.py
+   python app.py
    ```
 
 ### Quando terminar
