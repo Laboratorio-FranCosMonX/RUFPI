@@ -59,7 +59,7 @@ No perfil de usuário, o usuário pode gerenciar algumas informações como nome
 
 <div align="center">
 <img src="../src/imagens/perfilFrontend.png"> </img>
-<p>Criação de um novo cardápio</p>
+<p>Tela para o gerenciamento de dados do usuário.</p>
 </div>
 
 Na página inicial, ao selecionar a funcionalidade de criar cardápio, irá aparecer uma janela para que o usuário preencha os campos para o cadastro de um cardápio de forma simples.
