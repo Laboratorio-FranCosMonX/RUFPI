@@ -2,6 +2,7 @@ import { Avatar, Box, Button, Container, Divider, Grid2, LinearProgress, Typogra
 import { useEffect, useState } from "react";
 import MainMenu from "../components/MainMenu";
 import api from "../utils/api/api";
+import AdicionarFichas from "./AddChips";
 import AtualizarEmail from "./UpdateEmail";
 import AtualizarSenha from "./UpdatePassword";
 import AtualizarPerfil from "./UpdateProfile";
@@ -96,6 +97,16 @@ const Perfil = () => {
           id={profile.id}
         />
       )
+
+    if (modal.comprarFicha)
+      return (
+        <AdicionarFichas
+          fecharModal={callbackCloseModal}
+          atualizarDados={callbackModalOK}
+          id={profile.id}
+        />
+      )
+
     return (
       <AtualizarSenha fecharModal={callbackCloseModal} updateAt={new Date(Date.now())} id={profile.id} />
     )
@@ -155,7 +166,12 @@ const Perfil = () => {
               })
 
             }}>Atualizar Senha</Button>
-            <Button sx={{ width: '180px' }} variant="contained">Comprar Fichas</Button>
+            <Button sx={{ width: '180px' }} variant="contained" onClick={() => {
+              setModal({
+                ...modal,
+                comprarFicha: true
+              })
+            }}>Comprar Fichas</Button>
           </Box>
         </Box>
       }
