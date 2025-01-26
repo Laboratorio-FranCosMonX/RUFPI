@@ -74,11 +74,22 @@ const RegistrarIngrediente = ({ fecharModal }: CadastrarIngredienteParams) => {
       }}
     >
       <form onSubmit={handleSubmit} className="global-form">
+        <Button
+          onClick={fecharModal}
+          sx={{
+            backgroundColor: 'red',
+            color: "white",
+            top: '10px',
+            right: '0px',
+            display: 'absolute',
+            padding: '0px',
+          }}
+          variant="contained">X</Button>
         <Card sx={{
           width: { xs: '50%', sm: '70%', md: '80%', lg: '90%', xl: '70%' },
           minWidth: '381px'
         }}>
-          <CardHeader title="Criar Novo Ingrediente" subheader="Cadastre um novo ingredient, como: Moqueca de banana." />
+          <CardHeader title="Criar Novo Ingrediente" subheader="Cadastre um novo ingrediente, como: Moqueca de banana." />
           <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <TextField
               label={"Informe o nome do ingrediente"}
@@ -97,7 +108,7 @@ const RegistrarIngrediente = ({ fecharModal }: CadastrarIngredienteParams) => {
                 }
               }}
             />
-            <Button variant="contained" onClick={() => handleSubmit()} sx={{ width: '100%' }}>Finalizar</Button>
+            <Button variant="contained" onClick={() => handleSubmit()} sx={{ width: '100%' }}>Registrar ingrediente</Button>
           </CardContent>
         </Card>
         {

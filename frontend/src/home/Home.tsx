@@ -42,11 +42,9 @@ const Home = () => {
     }
     api.get(`/cardapios/all`, dado)
       .then((dados) => {
-        //console.log(dados)
         const data: [CardapioType] = dados.data
         setCardapios(data)
         setHomeInicializada('dados ok')
-        // console.log(cardapios)
       })
       .catch(() => {
         setHomeInicializada('mensagem de null');
@@ -82,7 +80,6 @@ const Home = () => {
     if (!modalHome.cadastroCardapio && !modalHome.cadastrarPrato && !modalHome.cadastrarIngrediente)
       return null;
 
-    console.log(modalHome)
     if (modalHome.cadastrarPrato)
       return (
         <RegistrarPrato

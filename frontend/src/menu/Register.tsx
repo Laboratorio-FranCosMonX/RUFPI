@@ -151,7 +151,6 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
     //criando refeicao
     for (let refeicao of refeicoes) {
       if (refeicao.pratos.length > 0) {
-        console.log(refeicao.pratos)
         try {
           const response = await api.post("/refeicoes/create", {
             "tipo": refeicao.tipo,
@@ -178,8 +177,7 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
         }
       }
     }
-    // console.log(id_refeicoes)
-    // console.log(moment(new Date(Date.now()).getTime()).format("DD-MM-YYYY"))
+
     if (id_refeicoes.length > 0) {
       api.post("/cardapios/create", {
         data: moment(new Date(Date.now()).getTime()).format("DD-MM-YYYY"),
@@ -201,8 +199,7 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
           atualizarDados()
           fecharModal()
         }, 4000)
-        // console.log("Cadastro do cardápio executado com exito")
-      }).catch((/*error*/) => {
+      }).catch(() => {
         setMessageSystem({
           color: 'error',
           duracao: 4,
@@ -216,8 +213,6 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
             visivel: false
           })
         }, 4000)
-        // console.error("Cadastro do cardápio não executado")
-        // console.log(error)
       })
     }
   }
@@ -237,6 +232,17 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
       }}
     >
       <form onSubmit={handleSubmit} className="global-form">
+        <Button
+          onClick={fecharModal}
+          sx={{
+            backgroundColor: 'red',
+            color: "white",
+            top: '10px',
+            right: '0px',
+            display: 'absolute',
+            padding: '0px',
+          }}
+          variant="contained">X</Button>
         <Card sx={{
           width: { xs: '50%', sm: '70%', md: '80%', lg: '90%', xl: '70%' },
           minWidth: '381px'
@@ -348,9 +354,8 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
                   }} >Ver cardápio</Button>
                 </Box>
                 <Button variant="contained" onClick={() => {
-                  // console.log(refeicoes)
                   handleSubmit()
-                }}>Finalizar</Button>
+                }}>Registrar Cardápio</Button>
               </Box>
             </Box>
           </CardContent>

@@ -130,6 +130,17 @@ const RegistrarPrato = ({ fecharModal, callbackCadastrarIngrediente }: Cadastrar
       }}
     >
       <form onSubmit={handleSubmit} className="global-form">
+        <Button
+          onClick={fecharModal}
+          sx={{
+            backgroundColor: 'red',
+            color: "white",
+            top: '10px',
+            right: '0px',
+            display: 'absolute',
+            padding: '0px',
+          }}
+          variant="contained">X</Button>
         <Card sx={{
           width: { xs: '50%', sm: '70%', md: '80%', lg: '90%', xl: '70%' },
           minWidth: '381px'
@@ -200,24 +211,10 @@ const RegistrarPrato = ({ fecharModal, callbackCadastrarIngrediente }: Cadastrar
               </Tooltip>
             </ Box>
             <Button variant="outlined" onClick={() => {
-              // setMessageSystem({
-              //   message: "Em desenvolvimento",
-              //   duracao: 4,
-              //   color: 'info',
-              //   visivel: true
-              // })
-
-              // setTimeout(() => {
-              //   setMessageSystem({
-              //     ...messageSystem,
-              //     visivel: false
-              //   })
-              // }, 4000)
               setModalPratoOpen(false)
-              // fecharModal()
               callbackCadastrarIngrediente()
             }} sx={{ width: '100%' }}>Novo Ingrediente</Button>
-            <Button variant="contained" onClick={() => handleSubmit()} sx={{ width: '100%' }}>Finalizar</Button>
+            <Button variant="contained" onClick={() => handleSubmit()} sx={{ width: '100%' }}>Registrar prato</Button>
           </CardContent>
         </Card>
         {
