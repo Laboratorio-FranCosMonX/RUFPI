@@ -14,7 +14,12 @@ A aplicação foi desenvolvida no VSCode utilizando projeto React + vite + Types
 
 ### Execução
 
-Primeiro é necessário que seja feito a instalaçao das dependências utilizando o comando `pnpm i` e em seguida `pnpm run dev` para a executar a aplicação em modo desenvolvedor.
+O requisito mínimo para a execução deste sistema são:
+
+1. Node.js
+2. Gerenciador de pacotes PNPM: para a instalação deste em Windows, abra o prompt de comando e use o comando `npm install -g pnpm@latest` para instalar a última versão do PMPN.
+
+Para a execução, é necessário que seja feito a instalaçao das dependências utilizando o comando `pnpm i` e em seguida `pnpm run dev` para a executar a aplicação em modo desenvolvedor.
 
 ### Funcionalidades
 
