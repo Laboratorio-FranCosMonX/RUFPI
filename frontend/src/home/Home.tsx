@@ -63,25 +63,26 @@ const Home = () => {
   }
 
   const callbackRedirecionarParaCadastroPrato = () => {
-    callbackCloseModal()
     setModalHome({
-      ...modalHome,
+      cadastrarIngrediente: false,
+      cadastroCardapio: false,
       cadastrarPrato: true
     })
   }
 
   const callbackRedirecionarParaCadastroIngrediente = () => {
-    callbackCloseModal()
     setModalHome({
-      ...modalHome,
-      cadastrarIngrediente: true
+      cadastrarIngrediente: true,
+      cadastroCardapio: false,
+      cadastrarPrato: false
     })
   }
 
   const handleModal = () => {
-    if (!modalHome.cadastroCardapio && !modalHome.cadastrarPrato)
+    if (!modalHome.cadastroCardapio && !modalHome.cadastrarPrato && !modalHome.cadastrarIngrediente)
       return null;
 
+    console.log(modalHome)
     if (modalHome.cadastrarPrato)
       return (
         <RegistrarPrato
@@ -90,7 +91,6 @@ const Home = () => {
         />
       )
 
-    console.log(modalHome)
     if (modalHome.cadastrarIngrediente)
       return (
         <RegistrarIngrediente

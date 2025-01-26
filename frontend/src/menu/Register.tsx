@@ -47,8 +47,6 @@ const CadastroCardapio = ({ atualizarDados, fecharModal, callbackCadastroPrato }
   }, [modalInicializado])
 
   const procuraPrato = (search_id: number): PratoType | null => {
-    console.log("todos os pratos")
-    console.log(allPratos)
     for (let p of allPratos) {
       if (p.id === search_id) return p;
     }

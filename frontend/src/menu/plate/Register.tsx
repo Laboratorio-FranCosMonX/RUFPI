@@ -200,22 +200,22 @@ const RegistrarPrato = ({ fecharModal, callbackCadastrarIngrediente }: Cadastrar
               </Tooltip>
             </ Box>
             <Button variant="outlined" onClick={() => {
-              setMessageSystem({
-                message: "Em desenvolvimento",
-                duracao: 4,
-                color: 'info',
-                visivel: true
-              })
+              // setMessageSystem({
+              //   message: "Em desenvolvimento",
+              //   duracao: 4,
+              //   color: 'info',
+              //   visivel: true
+              // })
 
-              setTimeout(() => {
-                setMessageSystem({
-                  ...messageSystem,
-                  visivel: false
-                })
-              }, 4000)
-              // setModalPratoOpen(false)
+              // setTimeout(() => {
+              //   setMessageSystem({
+              //     ...messageSystem,
+              //     visivel: false
+              //   })
+              // }, 4000)
+              setModalPratoOpen(false)
               // fecharModal()
-              // callbackCadastrarIngrediente()
+              callbackCadastrarIngrediente()
             }} sx={{ width: '100%' }}>Novo Ingrediente</Button>
             <Button variant="contained" onClick={() => handleSubmit()} sx={{ width: '100%' }}>Finalizar</Button>
           </CardContent>

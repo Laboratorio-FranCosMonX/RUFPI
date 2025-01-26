@@ -16,7 +16,7 @@ const RegistrarIngrediente = ({ fecharModal }: CadastrarIngredienteParams) => {
   const [messageSystem, setMessageSystem] = useState<{ visivel: boolean, message: string, color: AlertColor, duracao: number }>({
     message: '', color: 'info', duracao: 4, visivel: false
   })
-  console.log("cadastrar ingrediente")
+
   const handleSubmit = () => {
     if (nome.length <= 0) {
       setErrorNome({
@@ -85,7 +85,7 @@ const RegistrarIngrediente = ({ fecharModal }: CadastrarIngredienteParams) => {
               value={nome}
               type={'text'}
               error={errorNome.error}
-              helperText={errorNome.message}
+              helperText={errorNome.error ? errorNome.message : ""}
               fullWidth
               onChange={(e) => {
                 setNome(e.target.value)
