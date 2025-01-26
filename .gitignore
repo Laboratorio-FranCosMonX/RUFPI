@@ -10,3 +10,9 @@ static/
 
 backend/test.py
 backend/(OLD)app.py
+backend/__pycache__
+backend/instance
+backend/routes/__pycache__
+backend/venv
+
+venv
